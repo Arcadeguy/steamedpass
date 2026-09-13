@@ -10,17 +10,21 @@ namespace Steamedpass.Core.Steam;
 /// </summary>
 public static class SteamProcess
 {
-    public static async Task<bool> RestartAsync(TimeSpan? timeout = null)
+    /// <param name="steamFolder">Steam's install folder (from SteamPaths.GetSteamFolder()).</param>
+    public static async Task<bool> RestartAsync(string steamFolder, TimeSpan? timeout = null)
     {
         timeout ??= TimeSpan.FromSeconds(8);
 
-        Process? steam = Process.GetProcessesByName("steam").SingleOrDefault();
-        if (steam is null)
+        if (!Process.GetProcessesByName("steam").Any())
         {
             return true;
         }
 
-        string steamExe = steam.MainModule!.FileName!;
+        // Built from the known install folder rather than Process.MainModule.FileName:
+        // querying a running process's module info requires OpenProcess access that
+        // Windows denies when Steam runs at a higher integrity level (elevated) than
+        // this process, or when security software is guarding it.
+        string steamExe = Path.Combine(steamFolder, "steam.exe");
 
         Process.Start(steamExe, "-exitsteam");
 

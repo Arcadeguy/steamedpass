@@ -59,7 +59,7 @@ public static class AddGamePipeline
             SteamShortcuts.AddOrUpdateShortcut(userDataDirectory, entry);
         }
 
-        bool restarted = await SteamProcess.RestartAsync();
+        bool restarted = await SteamProcess.RestartAsync(steamFolder);
 
         bool gridArtInstalled = await GridArtInstaller.TryInstallAsync(
             settings, game.Name, unchecked((uint)legacyAppId), shortcutId64, userDataDirectories);
