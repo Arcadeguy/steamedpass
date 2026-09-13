@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Steamedpass.App/Steamedpass.App.csproj" />
+    <Project Path="src/Steamedpass.Core/Steamedpass.Core.csproj" />
+  </Folder>
+</Solution>
