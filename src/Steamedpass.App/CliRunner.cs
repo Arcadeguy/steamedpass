@@ -77,8 +77,9 @@ internal static class CliRunner
 
         Console.WriteLine($"Added to Steam: {result.AddedToSteam}");
         Console.WriteLine($"Steam restarted: {result.SteamRestarted}");
-        Console.WriteLine($"Desktop icon extracted: {result.DesktopIconExtracted}");
-        Console.WriteLine($"Desktop shortcut: {result.DesktopShortcutPath}");
+        Console.WriteLine(result.DesktopShortcutPath is null
+            ? "Desktop shortcut: skipped (disabled in settings)"
+            : $"Desktop shortcut: {result.DesktopShortcutPath} (icon extracted: {result.DesktopIconExtracted})");
         Console.WriteLine($"Steam library grid art installed: {result.GridArtInstalled}");
         return 0;
     }

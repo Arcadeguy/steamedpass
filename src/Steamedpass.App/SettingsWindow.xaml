@@ -6,6 +6,9 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
         <StackPanel>
 
+            <TextBlock Text="Desktop Shortcut" FontWeight="Bold" Margin="0,0,0,4" />
+            <CheckBox x:Name="CreateDesktopShortcutCheck" Content="Create a desktop shortcut when adding a game to Steam" Margin="0,0,0,12" />
+
             <TextBlock Text="Language" FontWeight="Bold" Margin="0,0,0,4" />
             <CheckBox x:Name="ChangeLanguageCheck" Content="Override the game's UI language" Margin="0,0,0,4" />
             <ComboBox x:Name="LanguageCombo" Margin="0,0,0,12" />

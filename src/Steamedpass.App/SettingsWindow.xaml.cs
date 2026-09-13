@@ -22,6 +22,8 @@ public partial class SettingsWindow : Window
         InitializeComponent();
         _settings = SteamedpassSettings.Load();
 
+        CreateDesktopShortcutCheck.IsChecked = _settings.CreateDesktopShortcut;
+
         LanguageCombo.ItemsSource = CultureInfo.GetCultures(CultureTypes.AllCultures)
             .Select(c => c.Name).Where(n => !string.IsNullOrEmpty(n)).OrderBy(n => n).ToList();
         LanguageCombo.SelectedItem = string.IsNullOrEmpty(_settings.TargetLanguage)
@@ -60,6 +62,7 @@ public partial class SettingsWindow : Window
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
+        _settings.CreateDesktopShortcut = CreateDesktopShortcutCheck.IsChecked == true;
         _settings.ChangeLanguage = ChangeLanguageCheck.IsChecked == true;
         _settings.TargetLanguage = LanguageCombo.SelectedItem?.ToString() ?? string.Empty;
         _settings.PollSeconds = SecondsCombo.SelectedIndex;

@@ -65,16 +65,21 @@ public static class AddGamePipeline
             settings, game.Name, unchecked((uint)legacyAppId), shortcutId64, userDataDirectories);
 
         string? desktopIconPath = null;
-        using (var extractedIcon = IconExtractor.TryExtractIcon(game.Aumid))
-        {
-            if (extractedIcon is not null)
-            {
-                desktopIconPath = IconStore.GetIconPath(shortcutId64);
-                IcoEncoder.SaveAsIco(extractedIcon, desktopIconPath);
-            }
-        }
+        string? desktopShortcutPath = null;
 
-        string desktopShortcutPath = DesktopShortcutWriter.Write(game.Name, shortcutId64, desktopIconPath);
+        if (settings.CreateDesktopShortcut)
+        {
+            using (var extractedIcon = IconExtractor.TryExtractIcon(game.Aumid))
+            {
+                if (extractedIcon is not null)
+                {
+                    desktopIconPath = IconStore.GetIconPath(shortcutId64);
+                    IcoEncoder.SaveAsIco(extractedIcon, desktopIconPath);
+                }
+            }
+
+            desktopShortcutPath = DesktopShortcutWriter.Write(game.Name, shortcutId64, desktopIconPath);
+        }
 
         return new AddGameResult(
             AddedToSteam: true,

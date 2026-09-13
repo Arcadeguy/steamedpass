@@ -56,11 +56,14 @@ public partial class MainWindow : Window
             SteamedpassSettings settings = SteamedpassSettings.Load();
             AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, settings);
 
+            string desktopShortcutStatus = result.DesktopShortcutPath is null
+                ? "skipped (disabled in settings)"
+                : $"{result.DesktopShortcutPath} (icon extracted: {result.DesktopIconExtracted})";
+
             StatusText.Text =
                 $"Done. Added to Steam: {result.AddedToSteam}. " +
-                $"Desktop icon extracted: {result.DesktopIconExtracted}. " +
                 $"Library grid art installed: {result.GridArtInstalled}. " +
-                $"Desktop shortcut: {result.DesktopShortcutPath}";
+                $"Desktop shortcut: {desktopShortcutStatus}";
         }
         catch (Exception ex)
         {

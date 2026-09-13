@@ -4,5 +4,5 @@ public sealed record AddGameResult(
     bool AddedToSteam,
     bool SteamRestarted,
     bool DesktopIconExtracted,
-    string DesktopShortcutPath,
+    string? DesktopShortcutPath,
     bool GridArtInstalled);

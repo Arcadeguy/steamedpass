@@ -45,6 +45,9 @@ public sealed class SteamedpassSettings
     /// <summary>"&lt;width&gt; x &lt;height&gt;". Empty = current display resolution.</summary>
     public string TargetResolution { get; set; } = string.Empty;
 
+    /// <summary>Whether adding a game also authors a desktop shortcut for it.</summary>
+    public bool CreateDesktopShortcut { get; set; } = true;
+
     private static string SettingsPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "steamedpass", "settings.json");
