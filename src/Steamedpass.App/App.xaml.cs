@@ -1,4 +1,6 @@
 using System.Windows;
+using Steamedpass.Core.Logging;
+using Steamedpass.Core.Settings;
 
 namespace Steamedpass.App;
 
@@ -9,6 +11,9 @@ public partial class App : Application
 {
     protected override async void OnStartup(StartupEventArgs e)
     {
+        SteamedpassSettings settings = SteamedpassSettings.Load();
+        AppLog.Initialize(settings.LogLevel);
+
         string[] args = e.Args;
 
         // Steam invokes this exe as "<exe> <aumid> <executable> [...]" to launch a game.

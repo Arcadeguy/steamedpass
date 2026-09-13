@@ -1,3 +1,5 @@
+using Steamedpass.Core.Settings;
+
 namespace Steamedpass.Core.GridArt;
 
 /// <summary>
@@ -11,11 +13,16 @@ namespace Steamedpass.Core.GridArt;
 public static class GridArtInstaller
 {
     public static async Task<bool> TryInstallAsync(
-        string apiKey, string gameName, uint legacyAppId, ulong shortcutId64, string[] userDataDirectories)
+        SteamedpassSettings settings, string gameName, uint legacyAppId, ulong shortcutId64, string[] userDataDirectories)
     {
+        if (string.IsNullOrWhiteSpace(settings.SteamGridDbApiKey))
+        {
+            return false;
+        }
+
         try
         {
-            var client = new SteamGridDbClient(apiKey);
+            var client = new SteamGridDbClient(settings.SteamGridDbApiKey);
             SteamGridDbGame[] matches = await client.SearchGameAsync(gameName);
             if (matches.Length == 0)
             {
@@ -23,11 +30,17 @@ public static class GridArtInstaller
             }
 
             int gameId = matches[0].Id;
+            string filterParams = SteamGridDbOptions.BuildQueryParameters(
+                settings.SteamGridDbStyle, settings.SteamGridDbType, settings.SteamGridDbNsfw, settings.SteamGridDbHumor, dimensions: null);
+            string verticalFilterParams = SteamGridDbOptions.BuildQueryParameters(
+                settings.SteamGridDbStyle, settings.SteamGridDbType, settings.SteamGridDbNsfw, settings.SteamGridDbHumor, "600x900,342x482,660x930");
+            string horizontalFilterParams = SteamGridDbOptions.BuildQueryParameters(
+                settings.SteamGridDbStyle, settings.SteamGridDbType, settings.SteamGridDbNsfw, settings.SteamGridDbHumor, "460x215,920x430");
 
-            SteamGridDbImage[] verticalGrids = await client.GetGridsAsync(gameId, "600x900,342x482,660x930");
-            SteamGridDbImage[] horizontalGrids = await client.GetGridsAsync(gameId, "460x215,920x430");
-            SteamGridDbImage[] heroes = await client.GetHeroesAsync(gameId);
-            SteamGridDbImage[] logos = await client.GetLogosAsync(gameId);
+            SteamGridDbImage[] verticalGrids = await client.GetGridsAsync(gameId, "600x900,342x482,660x930", verticalFilterParams);
+            SteamGridDbImage[] horizontalGrids = await client.GetGridsAsync(gameId, "460x215,920x430", horizontalFilterParams);
+            SteamGridDbImage[] heroes = await client.GetHeroesAsync(gameId, filterParams);
+            SteamGridDbImage[] logos = await client.GetLogosAsync(gameId, filterParams);
 
             using var httpClient = new HttpClient();
 

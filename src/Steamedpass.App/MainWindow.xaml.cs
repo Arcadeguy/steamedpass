@@ -1,6 +1,7 @@
 using System.Windows;
 using Steamedpass.Core.Discovery;
 using Steamedpass.Core.Pipeline;
+using Steamedpass.Core.Settings;
 
 namespace Steamedpass.App;
 
@@ -52,7 +53,8 @@ public partial class MainWindow : Window
         try
         {
             string exePath = Environment.ProcessPath!;
-            AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, tags: Array.Empty<string>());
+            SteamedpassSettings settings = SteamedpassSettings.Load();
+            AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, settings);
 
             StatusText.Text =
                 $"Done. Added to Steam: {result.AddedToSteam}. " +
@@ -68,5 +70,11 @@ public partial class MainWindow : Window
         {
             IsEnabled = true;
         }
+    }
+
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        var settingsWindow = new SettingsWindow { Owner = this };
+        settingsWindow.ShowDialog();
     }
 }

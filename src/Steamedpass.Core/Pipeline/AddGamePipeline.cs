@@ -15,8 +15,10 @@ namespace Steamedpass.Core.Pipeline;
 /// </summary>
 public static class AddGamePipeline
 {
-    public static async Task<AddGameResult> RunAsync(InstalledGame game, string steamedpassExePath, string[] tags)
+    public static async Task<AddGameResult> RunAsync(InstalledGame game, string steamedpassExePath, SteamedpassSettings settings)
     {
+        string[] tags = settings.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
         string? steamFolder = SteamPaths.GetSteamFolder();
         if (steamFolder is null)
         {
@@ -59,13 +61,8 @@ public static class AddGamePipeline
 
         bool restarted = await SteamProcess.RestartAsync();
 
-        bool gridArtInstalled = false;
-        string? apiKey = SteamedpassSettings.Load().SteamGridDbApiKey;
-        if (!string.IsNullOrWhiteSpace(apiKey))
-        {
-            gridArtInstalled = await GridArtInstaller.TryInstallAsync(
-                apiKey, game.Name, unchecked((uint)legacyAppId), shortcutId64, userDataDirectories);
-        }
+        bool gridArtInstalled = await GridArtInstaller.TryInstallAsync(
+            settings, game.Name, unchecked((uint)legacyAppId), shortcutId64, userDataDirectories);
 
         string? desktopIconPath = null;
         using (var extractedIcon = IconExtractor.TryExtractIcon(game.Aumid))

@@ -1,9 +1,6 @@
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Management.Automation;
-using System.Management.Automation.Runspaces;
 using System.Reflection;
-using System.Text;
+using Steamedpass.Core.Scripting;
 
 namespace Steamedpass.Core.Discovery;
 
@@ -17,7 +14,7 @@ public static class GameScanner
     public static IReadOnlyList<InstalledGame> GetInstalledGames()
     {
         string scriptText = ReadEmbeddedScript();
-        string rawOutput = RunScript(scriptText);
+        string rawOutput = PowerShellRunner.Run(scriptText);
 
         var games = new List<InstalledGame>();
         foreach (string entry in rawOutput.Split(';'))
@@ -50,25 +47,5 @@ public static class GameScanner
         using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
-    }
-
-    private static string RunScript(string scriptText)
-    {
-        using Runspace runspace = RunspaceFactory.CreateRunspace();
-        runspace.Open();
-
-        using var pipeline = runspace.CreatePipeline();
-        pipeline.Commands.AddScript(scriptText);
-        pipeline.Commands.Add("Out-String");
-
-        Collection<PSObject> results = pipeline.Invoke();
-
-        var stringBuilder = new StringBuilder();
-        foreach (PSObject obj in results)
-        {
-            stringBuilder.AppendLine(obj.ToString());
-        }
-
-        return stringBuilder.ToString();
     }
 }

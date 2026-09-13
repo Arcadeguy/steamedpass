@@ -65,6 +65,22 @@ public static class SteamShortcuts
         File.WriteAllBytes(shortcutFile, VDFSerializer.Serialize(shortcuts));
     }
 
+    /// <summary>
+    /// Removes ALL non-Steam shortcuts for a user (not just ones steamedpass added),
+    /// after backing up the previous file. Matches UWPHook's "Clear All" maintenance
+    /// action - callers must confirm with the user before invoking this.
+    /// </summary>
+    public static void ClearAllShortcuts(string userDataDirectory)
+    {
+        string configDirectory = Path.Combine(userDataDirectory, "config");
+        Directory.CreateDirectory(configDirectory);
+
+        BackupShortcuts(userDataDirectory);
+
+        string shortcutFile = Path.Combine(configDirectory, "shortcuts.vdf");
+        File.WriteAllBytes(shortcutFile, VDFSerializer.Serialize(Array.Empty<VDFEntry>()));
+    }
+
     private static void BackupShortcuts(string userDataDirectory)
     {
         string sourceFile = Path.Combine(userDataDirectory, "config", "shortcuts.vdf");

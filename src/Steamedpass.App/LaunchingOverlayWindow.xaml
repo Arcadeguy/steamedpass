@@ -1,0 +1,17 @@
+<Window x:Class="Steamedpass.App.LaunchingOverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        WindowState="Maximized"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Background="Black">
+    <Grid>
+        <TextBlock x:Name="MessageText"
+                   Text="Launching..."
+                   Foreground="White"
+                   FontSize="28"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" />
+    </Grid>
+</Window>

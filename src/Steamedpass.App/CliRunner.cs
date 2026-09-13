@@ -72,7 +72,8 @@ internal static class CliRunner
         Console.WriteLine($"Adding '{game.Name}' to Steam...");
 
         string exePath = Environment.ProcessPath!;
-        AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, tags: Array.Empty<string>());
+        SteamedpassSettings settings = SteamedpassSettings.Load();
+        AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, settings);
 
         Console.WriteLine($"Added to Steam: {result.AddedToSteam}");
         Console.WriteLine($"Steam restarted: {result.SteamRestarted}");

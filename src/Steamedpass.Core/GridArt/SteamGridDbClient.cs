@@ -39,14 +39,14 @@ public sealed class SteamGridDbClient
         return parsed?.Data ?? Array.Empty<SteamGridDbGame>();
     }
 
-    public Task<SteamGridDbImage[]> GetGridsAsync(int gameId, string dimensions) =>
-        GetImagesAsync($"grids/game/{gameId}?dimensions={dimensions}");
+    public Task<SteamGridDbImage[]> GetGridsAsync(int gameId, string dimensions, string filterParams) =>
+        GetImagesAsync($"grids/game/{gameId}?dimensions={dimensions}&{filterParams}");
 
-    public Task<SteamGridDbImage[]> GetHeroesAsync(int gameId) =>
-        GetImagesAsync($"heroes/game/{gameId}");
+    public Task<SteamGridDbImage[]> GetHeroesAsync(int gameId, string filterParams) =>
+        GetImagesAsync($"heroes/game/{gameId}?{filterParams}");
 
-    public Task<SteamGridDbImage[]> GetLogosAsync(int gameId) =>
-        GetImagesAsync($"logos/game/{gameId}");
+    public Task<SteamGridDbImage[]> GetLogosAsync(int gameId, string filterParams) =>
+        GetImagesAsync($"logos/game/{gameId}?{filterParams}");
 
     private async Task<SteamGridDbImage[]> GetImagesAsync(string path)
     {
