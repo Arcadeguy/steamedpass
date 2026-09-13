@@ -35,8 +35,11 @@ public static class PackageIconResolver
             File.Copy(widest, destination, overwrite: true);
             return destination;
         }
-        catch (IOException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
+            // Some package folders under Program Files\WindowsApps have ACLs
+            // that deny direct copies (UnauthorizedAccessException, which is
+            // NOT an IOException) - fall back to the source path unmodified.
             return widest;
         }
     }
@@ -50,7 +53,7 @@ public static class PackageIconResolver
             images.AddRange(Directory.GetFiles(logoDirectory, "*.jpg"));
             images.AddRange(Directory.GetFiles(logoDirectory, "*.jpeg"));
         }
-        catch (DirectoryNotFoundException)
+        catch (Exception ex) when (ex is DirectoryNotFoundException or UnauthorizedAccessException)
         {
             return string.Empty;
         }

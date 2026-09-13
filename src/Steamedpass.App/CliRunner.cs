@@ -1,3 +1,4 @@
+using Serilog;
 using Steamedpass.Core.Discovery;
 using Steamedpass.Core.Pipeline;
 using Steamedpass.Core.Settings;
@@ -71,17 +72,27 @@ internal static class CliRunner
 
         Console.WriteLine($"Adding '{game.Name}' to Steam...");
 
-        string exePath = Environment.ProcessPath!;
-        SteamedpassSettings settings = SteamedpassSettings.Load();
-        AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, settings);
+        try
+        {
+            string exePath = Environment.ProcessPath!;
+            SteamedpassSettings settings = SteamedpassSettings.Load();
+            AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, settings);
 
-        Console.WriteLine($"Added to Steam: {result.AddedToSteam}");
-        Console.WriteLine($"Steam restarted: {result.SteamRestarted}");
-        Console.WriteLine(result.DesktopShortcutPath is null
-            ? "Desktop shortcut: skipped (disabled in settings)"
-            : $"Desktop shortcut: {result.DesktopShortcutPath} (icon extracted: {result.DesktopIconExtracted})");
-        Console.WriteLine($"Steam library grid art installed: {result.GridArtInstalled}");
-        return 0;
+            Console.WriteLine($"Added to Steam: {result.AddedToSteam}");
+            Console.WriteLine($"Steam restarted: {result.SteamRestarted}");
+            Console.WriteLine(result.DesktopShortcutPath is null
+                ? "Desktop shortcut: skipped (disabled in settings)"
+                : $"Desktop shortcut: {result.DesktopShortcutPath} (icon extracted: {result.DesktopIconExtracted})");
+            Console.WriteLine($"Steam library grid art installed: {result.GridArtInstalled}");
+            return 0;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to add {Game} to Steam", game.Name);
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine("See %AppData%\\steamedpass\\application.log for details.");
+            return 1;
+        }
     }
 
     private static int RunConfig(string[] args)

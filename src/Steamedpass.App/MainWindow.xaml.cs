@@ -1,4 +1,5 @@
 using System.Windows;
+using Serilog;
 using Steamedpass.Core.Discovery;
 using Steamedpass.Core.Pipeline;
 using Steamedpass.Core.Settings;
@@ -67,7 +68,8 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Error: {ex.Message}";
+            Log.Error(ex, "Failed to add {Game} to Steam", game.Name);
+            StatusText.Text = $"Error: {ex.Message} (see %AppData%\\steamedpass\\application.log for details)";
         }
         finally
         {
