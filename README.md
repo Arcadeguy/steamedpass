@@ -42,14 +42,14 @@ SteamGridDB.
 dotnet build Steamedpass.slnx
 ```
 
-The app is `src/Steamedpass.App/bin/Debug/net10.0-windows/Steamedpass.App.exe`.
+The app is `src/Steamedpass.App/bin/Debug/net10.0-windows/steamedpass.exe`.
 It's a portable executable — no installer — but it needs to stay at a
 stable path once you've added games with it, since Steam launches games
 *through* this exe (see "How launching works" below).
 
 ## Using the GUI
 
-Run `Steamedpass.App.exe` with no arguments. Pick a game from the list and
+Run `steamedpass.exe` with no arguments. Pick a game from the list and
 click **Add to Steam**. Click **Settings** to configure the SteamGridDB API
 key, language/resolution overrides, log level, category tags, and other
 options (see below).
@@ -88,7 +88,7 @@ via the Win32 display API instead, so if you enable it, it actually works.
 ## How launching works
 
 Steam can't launch an arbitrary AUMID directly, so the shortcut's `Exe`
-points back at `Steamedpass.App.exe` itself with the AUMID and executable
+points back at `steamedpass.exe` itself with the AUMID and executable
 name as launch arguments. When invoked that way, it activates the app via
 the same Windows API Explorer uses (`IApplicationActivationManager`, which
 also returns a real process ID so Steam's playtime/running-state tracking

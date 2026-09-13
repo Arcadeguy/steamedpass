@@ -66,6 +66,35 @@ public static class SteamShortcuts
     }
 
     /// <summary>
+    /// Removes a single shortcut matching AppName+Exe, if present, after backing up
+    /// the previous file. Returns true if an entry was found and removed.
+    /// </summary>
+    public static bool RemoveShortcut(string userDataDirectory, string appName, string exe)
+    {
+        VDFEntry[] shortcuts = ReadShortcuts(userDataDirectory);
+        VDFEntry[] remaining = shortcuts.Where(s => !(s.AppName == appName && s.Exe == exe)).ToArray();
+
+        if (remaining.Length == shortcuts.Length)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < remaining.Length; i++)
+        {
+            remaining[i].Index = i;
+        }
+
+        string configDirectory = Path.Combine(userDataDirectory, "config");
+        Directory.CreateDirectory(configDirectory);
+
+        BackupShortcuts(userDataDirectory);
+
+        string shortcutFile = Path.Combine(configDirectory, "shortcuts.vdf");
+        File.WriteAllBytes(shortcutFile, VDFSerializer.Serialize(remaining));
+        return true;
+    }
+
+    /// <summary>
     /// Removes ALL non-Steam shortcuts for a user (not just ones steamedpass added),
     /// after backing up the previous file. Matches UWPHook's "Clear All" maintenance
     /// action - callers must confirm with the user before invoking this.
