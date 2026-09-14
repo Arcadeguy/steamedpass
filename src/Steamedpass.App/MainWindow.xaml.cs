@@ -21,6 +21,11 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     public MainWindow()
     {
         InitializeComponent();
+
+        string titleWithVersion = $"SteamedPass v{AppInfo.Version}";
+        Title = titleWithVersion;
+        AppTitleBar.Title = titleWithVersion;
+
         Loaded += (_, _) =>
         {
             RefreshGames();

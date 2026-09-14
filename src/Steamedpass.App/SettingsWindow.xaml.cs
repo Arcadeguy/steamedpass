@@ -25,6 +25,7 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
     {
         InitializeComponent();
         Closing += SettingsWindow_Closing;
+        VersionText.Text = $"Version {AppInfo.Version}";
         _settings = SteamedpassSettings.Load();
         _originalThemeMode = _settings.ThemeMode;
 
