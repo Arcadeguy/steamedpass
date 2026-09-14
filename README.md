@@ -31,12 +31,24 @@ SteamGridDB.
 
 ## Installation
 
-SteamedPass is a portable executable — there's no installer, and no
-pre-built download yet, so build it from source:
+SteamedPass is a portable executable — there's no installer. Windows 10/11
+is required either way (this uses WPF and Win32 APIs and won't build or run
+on other platforms).
+
+### Option 1: Download a release (easiest)
+
+1. Grab the latest `SteamedPass-<version>-win.zip` from the
+   [Releases page](https://github.com/Arcadeguy/steamedpass/releases) and
+   extract it anywhere.
+2. Install the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
+   if you don't already have it (the release download is framework-dependent,
+   so it needs the runtime — not the full SDK — installed separately).
+3. Make sure Steam is installed.
+4. Run `steamedpass.exe` from the extracted folder.
+
+### Option 2: Build from source
 
 1. Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
-   Windows 10/11 is required — this uses WPF and Win32 APIs and won't build
-   or run on other platforms.
 2. Make sure Steam is installed.
 3. Clone the repo and build it:
 
@@ -48,9 +60,10 @@ pre-built download yet, so build it from source:
 
 4. Run it from `src/Steamedpass.App/bin/Debug/net10.0-windows/steamedpass.exe`.
 
-Keep the exe at a stable path once you've added games with it — Steam
-launches games *through* this same exe (see "How launching works" below),
-so moving or deleting it breaks any shortcuts you've already created.
+Either way, keep the exe at a stable path once you've added games with it —
+Steam launches games *through* this same exe (see "How launching works"
+below), so moving or deleting it breaks any shortcuts you've already
+created.
 
 Optional: get a free [SteamGridDB API key](https://www.steamgriddb.com/profile/preferences/api)
 and paste it into Settings to enable Library grid/hero/logo art.
