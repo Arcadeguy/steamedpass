@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Resource Include="Resources\SteamedPass.png" />
+    <Resource Include="Resources\SteamedPass.ico" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -19,6 +20,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AssemblyName>steamedpass</AssemblyName>
+    <ApplicationIcon>Resources\SteamedPass.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

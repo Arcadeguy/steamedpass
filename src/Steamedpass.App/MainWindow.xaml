@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         Title="steamedpass" Height="640" Width="820"
         MinHeight="480" MinWidth="640"
+        Icon="Resources/SteamedPass.ico"
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica"
         WindowStartupLocation="CenterScreen">
@@ -17,7 +18,11 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Title="steamedpass" Grid.Row="0" />
+        <ui:TitleBar Title="steamedpass" Grid.Row="0">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="Resources/SteamedPass.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
         <Grid Grid.Row="1" Margin="20,8,20,20">
             <Grid.RowDefinitions>
