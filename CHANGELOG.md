@@ -2,6 +2,16 @@
 
 All notable changes to SteamedPass are documented in this file.
 
+## [1.0.3] - 2026-09-14
+
+### Changed
+
+- Updated all NuGet dependencies to their latest versions, including
+  `System.Security.Cryptography.Xml` (fixing a known vulnerability),
+  Serilog and its sinks, `Microsoft.PowerShell.SDK` /
+  `System.Management.Automation`, `System.Drawing.Common`, and the Vanara
+  P/Invoke packages.
+
 ## [1.0.2] - 2026-09-13
 
 ### Added
