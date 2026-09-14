@@ -206,6 +206,7 @@
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center" Opacity="0.8" Margin="0,0,0,12">
                                 <Run Text="Adapts discovery and shortcut handling from UWPHook and VDFParser (MIT licensed)." />
                             </TextBlock>
+                            <ui:HyperlinkButton Content="SteamedPass @ GitHub" Icon="{ui:SymbolIcon Open24}" NavigateUri="https://github.com/Arcadeguy/steamedpass" HorizontalAlignment="Center" Margin="0,0,0,4" />
                             <ui:HyperlinkButton Content="UWPHook @ GitHub" Icon="{ui:SymbolIcon Open24}" NavigateUri="https://github.com/BrianLima/UWPHook" HorizontalAlignment="Center" Margin="0,0,0,4" />
                             <ui:HyperlinkButton Content="VDFParser @ GitHub" Icon="{ui:SymbolIcon Open24}" NavigateUri="https://github.com/BrianLima/VDFParser" HorizontalAlignment="Center" />
                         </StackPanel>
