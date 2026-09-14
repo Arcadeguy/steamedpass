@@ -102,7 +102,7 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
         string? steamFolder = SteamPaths.GetSteamFolder();
         if (steamFolder is null)
         {
-            MessageBox.Show("Could not locate a Steam installation.", "steamedpass", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Could not locate a Steam installation.", "SteamedPass", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
@@ -111,7 +111,7 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
             SteamShortcuts.ClearAllShortcuts(userDataDirectory);
         }
 
-        MessageBox.Show("All non-Steam shortcuts have been cleared. Restart Steam to see the change.", "steamedpass", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show("All non-Steam shortcuts have been cleared. Restart Steam to see the change.", "SteamedPass", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     private static void OpenUrl(string url) =>

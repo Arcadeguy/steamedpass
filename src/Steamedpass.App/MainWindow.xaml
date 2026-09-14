@@ -6,19 +6,81 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:local="clr-namespace:Steamedpass.App"
         mc:Ignorable="d"
-        Title="steamedpass" Height="640" Width="820"
+        Title="SteamedPass" Height="640" Width="820"
         MinHeight="480" MinWidth="640"
         Icon="Resources/SteamedPass.ico"
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica"
         WindowStartupLocation="CenterScreen">
+    <ui:FluentWindow.Resources>
+        <Style x:Key="GamesGridHeaderStyle" TargetType="GridViewColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="4,10" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GridViewColumnHeader">
+                        <Grid>
+                            <Border x:Name="HeaderBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{DynamicResource AccentButtonBackground}"
+                                    BorderThickness="0,0,0,2">
+                                <Border Margin="6,0,0,0" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Content="{TemplateBinding Content}"
+                                        RecognizesAccessKey="True" />
+                                </Border>
+                            </Border>
+                            <Canvas>
+                                <Thumb Name="PART_HeaderGripper">
+                                    <Thumb.Style>
+                                        <Style TargetType="Thumb">
+                                            <Setter Property="Canvas.Right" Value="-9" />
+                                            <Setter Property="Width" Value="18" />
+                                            <Setter Property="Height" Value="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border Padding="{TemplateBinding Padding}" Background="#00FFFFFF">
+                                                            <Rectangle Width="1" HorizontalAlignment="Center" Fill="{TemplateBinding Background}" />
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Thumb.Style>
+                                </Thumb>
+                            </Canvas>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ui:FluentWindow.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Title="steamedpass" Grid.Row="0">
+        <ui:TitleBar Title="SteamedPass" Grid.Row="0">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="Resources/SteamedPass.ico" />
             </ui:TitleBar.Icon>
@@ -37,10 +99,10 @@
             <ui:Card Grid.Row="1" Padding="0">
                 <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent">
                     <ui:ListView.View>
-                        <ui:GridView>
-                            <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="260" />
-                            <GridViewColumn Header="Executable" DisplayMemberBinding="{Binding Executable}" Width="200" />
-                            <GridViewColumn Header="AUMID" DisplayMemberBinding="{Binding Aumid}" Width="280" />
+                        <ui:GridView ColumnHeaderContainerStyle="{StaticResource GamesGridHeaderStyle}">
+                            <GridViewColumn x:Name="NameColumn" Header="Name" DisplayMemberBinding="{Binding Name}" Width="260" />
+                            <GridViewColumn x:Name="ExecutableColumn" Header="Executable" DisplayMemberBinding="{Binding Executable}" Width="200" />
+                            <GridViewColumn x:Name="AumidColumn" Header="AUMID" DisplayMemberBinding="{Binding Aumid}" Width="280" />
                         </ui:GridView>
                     </ui:ListView.View>
                 </ui:ListView>
