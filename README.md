@@ -49,8 +49,10 @@ stable path once you've added games with it, since Steam launches games
 
 ## Using the GUI
 
-Run `steamedpass.exe` with no arguments. Pick a game from the list and
-click **Add to Steam**. Click **Settings** to configure the SteamGridDB API
+Run `steamedpass.exe` with no arguments. Check the box next to one or more
+games in the list (or use the header checkbox to select/deselect all) and
+click **Add Selected to Steam** — Steam is only restarted once no matter how
+many games you selected. Click **Settings** to configure the SteamGridDB API
 key, language/resolution overrides, log level, category tags, and other
 options (see below).
 
@@ -59,9 +61,16 @@ options (see below).
 ```
 steamedpass list
 steamedpass add --name "Halo Infinite"
-steamedpass add --aumid <AUMID>
+steamedpass add --name "Halo Infinite" --name "Forza Horizon 5"
+steamedpass add --aumid <AUMID> --aumid <another AUMID>
+steamedpass add --all
 steamedpass config --steamgriddb-key <key>
 ```
+
+`--name` and `--aumid` are repeatable and can be mixed in one `add` call;
+`--all` adds every installed Game Pass app. Either way, all selected games
+are written to `shortcuts.vdf` and Steam is restarted once for the whole
+batch.
 
 `add` runs the exact same pipeline as the GUI's one-click action.
 

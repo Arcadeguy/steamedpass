@@ -1,0 +1,36 @@
+using System.ComponentModel;
+using Steamedpass.Core.Discovery;
+
+namespace Steamedpass.App;
+
+/// <summary>
+/// Wraps an <see cref="InstalledGame"/> with a checkbox selection state for the
+/// games grid, so multiple apps can be added to Steam in one batch.
+/// </summary>
+public sealed class SelectableGame(InstalledGame game) : INotifyPropertyChanged
+{
+    private bool _isSelected;
+
+    public InstalledGame Game { get; } = game;
+
+    public string Name => Game.Name;
+    public string Executable => Game.Executable;
+    public string Aumid => Game.Aumid;
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected == value)
+            {
+                return;
+            }
+
+            _isSelected = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+}

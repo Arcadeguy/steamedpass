@@ -21,8 +21,36 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     public MainWindow()
     {
         InitializeComponent();
-        Loaded += (_, _) => RefreshGames();
+        Loaded += (_, _) =>
+        {
+            RefreshGames();
+
+            // The ListView hasn't finished its first layout pass yet at this point,
+            // so the other columns' ActualWidth isn't reliable until it settles.
+            Dispatcher.BeginInvoke(ResizeAumidColumn, System.Windows.Threading.DispatcherPriority.Loaded);
+        };
         GamesList.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(GamesList_HeaderClick));
+        GamesList.SizeChanged += (_, _) => ResizeAumidColumn();
+
+        // The AUMID column fills whatever space the others don't use, so it always
+        // reaches the right edge - re-measure it whenever an earlier column is resized.
+        DependencyPropertyDescriptor widthDescriptor =
+            DependencyPropertyDescriptor.FromProperty(GridViewColumn.WidthProperty, typeof(GridViewColumn));
+        foreach (GridViewColumn column in new[] { SelectColumn, NameColumn, ExecutableColumn })
+        {
+            widthDescriptor.AddValueChanged(column, (_, _) => ResizeAumidColumn());
+        }
+    }
+
+    private void ResizeAumidColumn()
+    {
+        double used = SelectColumn.ActualWidth + NameColumn.ActualWidth + ExecutableColumn.ActualWidth;
+        double available = GamesList.ActualWidth - used - SystemParameters.VerticalScrollBarWidth - 8;
+
+        if (available > 120)
+        {
+            AumidColumn.Width = available;
+        }
     }
 
     private void RefreshButton_Click(object sender, RoutedEventArgs e) => RefreshGames();
@@ -35,8 +63,9 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         try
         {
             IReadOnlyList<InstalledGame> games = GameScanner.GetInstalledGames();
-            GamesList.ItemsSource = games;
+            GamesList.ItemsSource = games.Select(g => new SelectableGame(g)).ToList();
             ApplyCurrentSort();
+            SelectAllCheckBox.IsChecked = false;
             StatusText.Text = $"{games.Count} app(s) found.";
         }
         catch (Exception ex)
@@ -46,6 +75,15 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         finally
         {
             IsEnabled = true;
+        }
+    }
+
+    private void SelectAllCheckBox_Click(object sender, RoutedEventArgs e)
+    {
+        bool select = SelectAllCheckBox.IsChecked == true;
+        foreach (SelectableGame game in GamesList.Items.OfType<SelectableGame>())
+        {
+            game.IsSelected = select;
         }
     }
 
@@ -99,6 +137,14 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
         foreach (GridViewColumn column in gridView.Columns)
         {
+            if (GetSortProperty(column) is null)
+            {
+                // Not a sortable, text-headed column (e.g. the "Select" checkbox
+                // column) - its Header is a CheckBox control, not a string, so
+                // leave it alone rather than stomping it with Header.ToString().
+                continue;
+            }
+
             if (!_originalHeaderText.TryGetValue(column, out string? baseText))
             {
                 baseText = column.Header?.ToString() ?? string.Empty;
@@ -116,33 +162,38 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private async void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        if (GamesList.SelectedItem is not InstalledGame game)
+        List<InstalledGame> selectedGames = GamesList.Items.OfType<SelectableGame>()
+            .Where(g => g.IsSelected)
+            .Select(g => g.Game)
+            .ToList();
+
+        if (selectedGames.Count == 0)
         {
-            MessageBox.Show("Select a game first.", "SteamedPass", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Select at least one game first.", "SteamedPass", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
         IsEnabled = false;
-        StatusText.Text = $"Adding '{game.Name}' to Steam (Steam will restart)...";
+        StatusText.Text = selectedGames.Count == 1
+            ? $"Adding '{selectedGames[0].Name}' to Steam (Steam will restart)..."
+            : $"Adding {selectedGames.Count} apps to Steam (Steam will restart)...";
 
         try
         {
             string exePath = Environment.ProcessPath!;
             SteamedpassSettings settings = SteamedpassSettings.Load();
-            AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, settings);
+            AddGamesResult result = await AddGamePipeline.RunAsync(selectedGames, exePath, settings);
 
-            string desktopShortcutStatus = result.DesktopShortcutPath is null
-                ? "skipped (disabled in settings)"
-                : $"{result.DesktopShortcutPath} (icon extracted: {result.DesktopIconExtracted})";
+            int gridArtCount = result.Games.Count(g => g.Result.GridArtInstalled);
+            int desktopShortcutCount = result.Games.Count(g => g.Result.DesktopShortcutPath is not null);
 
             StatusText.Text =
-                $"Done. Added to Steam: {result.AddedToSteam}. " +
-                $"Library grid art installed: {result.GridArtInstalled}. " +
-                $"Desktop shortcut: {desktopShortcutStatus}";
+                $"Done. Added {result.Games.Count} app(s) to Steam. Steam restarted: {result.SteamRestarted}. " +
+                $"Library grid art installed for {gridArtCount}. Desktop shortcuts created for {desktopShortcutCount}.";
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to add {Game} to Steam", game.Name);
+            Log.Error(ex, "Failed to add {Count} game(s) to Steam", selectedGames.Count);
             StatusText.Text = $"Error: {ex.Message} (see %AppData%\\steamedpass\\application.log for details)";
         }
         finally

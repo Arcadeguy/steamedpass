@@ -9,14 +9,24 @@ using VDFParser.Models;
 namespace Steamedpass.Core.Pipeline;
 
 /// <summary>
-/// The one-click flow: add a Game Pass game to Steam as a non-Steam shortcut,
-/// restart Steam so the entry is registered, extract a proper icon from the
-/// AUMID, and author a desktop shortcut that actually shows it.
+/// The one-click flow: add one or more Game Pass games to Steam as non-Steam
+/// shortcuts, restart Steam once so the entries are registered, extract a
+/// proper icon from each AUMID, and author desktop shortcuts that actually
+/// show them.
 /// </summary>
 public static class AddGamePipeline
 {
-    public static async Task<AddGameResult> RunAsync(InstalledGame game, string steamedpassExePath, SteamedpassSettings settings)
+    public static Task<AddGamesResult> RunAsync(InstalledGame game, string steamedpassExePath, SteamedpassSettings settings) =>
+        RunAsync(new[] { game }, steamedpassExePath, settings);
+
+    public static async Task<AddGamesResult> RunAsync(
+        IReadOnlyList<InstalledGame> games, string steamedpassExePath, SteamedpassSettings settings)
     {
+        if (games.Count == 0)
+        {
+            throw new ArgumentException("Specify at least one game to add.", nameof(games));
+        }
+
         string[] tags = settings.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         string? steamFolder = SteamPaths.GetSteamFolder();
@@ -31,61 +41,78 @@ public static class AddGamePipeline
             throw new InvalidOperationException("No Steam accounts found on this machine (steamapps/userdata is empty).");
         }
 
-        int legacyAppId = SteamAppId.ComputeLegacyAppId(steamedpassExePath, game.Name);
-        ulong shortcutId64 = SteamAppId.ComputeShortcutId64(steamedpassExePath, game.Name);
-        string vdfIcon = PackageIconResolver.ResolveAndPersist(game.Aumid, game.LogoDirectory);
+        var prepared = new List<(InstalledGame Game, VDFEntry Entry, int LegacyAppId, ulong ShortcutId64)>(games.Count);
 
-        var entry = new VDFEntry
+        foreach (InstalledGame game in games)
         {
-            appid = legacyAppId,
-            AppName = game.Name,
-            Exe = steamedpassExePath,
-            StartDir = Path.GetDirectoryName(steamedpassExePath) ?? string.Empty,
-            LaunchOptions = $"{game.Aumid} {game.Executable}",
-            Icon = vdfIcon,
-            ShortcutPath = string.Empty,
-            AllowDesktopConfig = 1,
-            AllowOverlay = 1,
-            IsHidden = 0,
-            OpenVR = 0,
-            Devkit = 0,
-            DevkitGameID = string.Empty,
-            LastPlayTime = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-            Tags = tags,
-        };
+            int legacyAppId = SteamAppId.ComputeLegacyAppId(steamedpassExePath, game.Name);
+            ulong shortcutId64 = SteamAppId.ComputeShortcutId64(steamedpassExePath, game.Name);
+            string vdfIcon = PackageIconResolver.ResolveAndPersist(game.Aumid, game.LogoDirectory);
 
+            var entry = new VDFEntry
+            {
+                appid = legacyAppId,
+                AppName = game.Name,
+                Exe = steamedpassExePath,
+                StartDir = Path.GetDirectoryName(steamedpassExePath) ?? string.Empty,
+                LaunchOptions = $"{game.Aumid} {game.Executable}",
+                Icon = vdfIcon,
+                ShortcutPath = string.Empty,
+                AllowDesktopConfig = 1,
+                AllowOverlay = 1,
+                IsHidden = 0,
+                OpenVR = 0,
+                Devkit = 0,
+                DevkitGameID = string.Empty,
+                LastPlayTime = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Tags = tags,
+            };
+
+            prepared.Add((game, entry, legacyAppId, shortcutId64));
+        }
+
+        // One read-modify-write pass per Steam user, covering every game in the batch,
+        // so shortcuts.vdf is only backed up/rewritten once regardless of batch size.
         foreach (string userDataDirectory in userDataDirectories)
         {
-            SteamShortcuts.AddOrUpdateShortcut(userDataDirectory, entry);
+            SteamShortcuts.AddOrUpdateShortcuts(userDataDirectory, prepared.Select(p => p.Entry));
         }
 
         bool restarted = await SteamProcess.RestartAsync(steamFolder);
 
-        bool gridArtInstalled = await GridArtInstaller.TryInstallAsync(
-            settings, game.Name, unchecked((uint)legacyAppId), shortcutId64, userDataDirectories);
+        var outcomes = new List<AddGameOutcome>(prepared.Count);
 
-        string? desktopIconPath = null;
-        string? desktopShortcutPath = null;
-
-        if (settings.CreateDesktopShortcut)
+        foreach (var (game, _, legacyAppId, shortcutId64) in prepared)
         {
-            using (var extractedIcon = IconExtractor.TryExtractIcon(game.Aumid))
+            bool gridArtInstalled = await GridArtInstaller.TryInstallAsync(
+                settings, game.Name, unchecked((uint)legacyAppId), shortcutId64, userDataDirectories);
+
+            string? desktopIconPath = null;
+            string? desktopShortcutPath = null;
+
+            if (settings.CreateDesktopShortcut)
             {
-                if (extractedIcon is not null)
+                using (var extractedIcon = IconExtractor.TryExtractIcon(game.Aumid))
                 {
-                    desktopIconPath = IconStore.GetIconPath(shortcutId64);
-                    IcoEncoder.SaveAsIco(extractedIcon, desktopIconPath);
+                    if (extractedIcon is not null)
+                    {
+                        desktopIconPath = IconStore.GetIconPath(shortcutId64);
+                        IcoEncoder.SaveAsIco(extractedIcon, desktopIconPath);
+                    }
                 }
+
+                desktopShortcutPath = DesktopShortcutWriter.Write(game.Name, shortcutId64, desktopIconPath);
             }
 
-            desktopShortcutPath = DesktopShortcutWriter.Write(game.Name, shortcutId64, desktopIconPath);
+            outcomes.Add(new AddGameOutcome(
+                game,
+                new AddGameResult(
+                    AddedToSteam: true,
+                    DesktopIconExtracted: desktopIconPath is not null,
+                    DesktopShortcutPath: desktopShortcutPath,
+                    GridArtInstalled: gridArtInstalled)));
         }
 
-        return new AddGameResult(
-            AddedToSteam: true,
-            SteamRestarted: restarted,
-            DesktopIconExtracted: desktopIconPath is not null,
-            DesktopShortcutPath: desktopShortcutPath,
-            GridArtInstalled: gridArtInstalled);
+        return new AddGamesResult(restarted, outcomes);
     }
 }

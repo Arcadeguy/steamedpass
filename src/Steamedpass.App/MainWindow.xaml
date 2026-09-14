@@ -100,9 +100,20 @@
                 <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent">
                     <ui:ListView.View>
                         <ui:GridView ColumnHeaderContainerStyle="{StaticResource GamesGridHeaderStyle}">
-                            <GridViewColumn x:Name="NameColumn" Header="Name" DisplayMemberBinding="{Binding Name}" Width="260" />
+                            <GridViewColumn x:Name="SelectColumn" Width="60">
+                                <GridViewColumn.Header>
+                                    <CheckBox x:Name="SelectAllCheckBox" Click="SelectAllCheckBox_Click" />
+                                </GridViewColumn.Header>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn x:Name="NameColumn" Header="Name" DisplayMemberBinding="{Binding Name}" Width="240" />
                             <GridViewColumn x:Name="ExecutableColumn" Header="Executable" DisplayMemberBinding="{Binding Executable}" Width="200" />
-                            <GridViewColumn x:Name="AumidColumn" Header="AUMID" DisplayMemberBinding="{Binding Aumid}" Width="280" />
+                            <GridViewColumn x:Name="AumidColumn" Header="AUMID" DisplayMemberBinding="{Binding Aumid}" Width="260" />
                         </ui:GridView>
                     </ui:ListView.View>
                 </ui:ListView>
@@ -110,7 +121,7 @@
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,14,0,0">
                 <ui:Button x:Name="RefreshButton" Content="Refresh" Icon="{ui:SymbolIcon ArrowClockwise24}" Margin="0,0,8,0" Click="RefreshButton_Click" />
-                <ui:Button x:Name="AddButton" Content="Add to Steam" Icon="{ui:SymbolIcon Add24}" Appearance="Primary" Margin="0,0,8,0" Click="AddButton_Click" />
+                <ui:Button x:Name="AddButton" Content="Add Selected to Steam" Icon="{ui:SymbolIcon Add24}" Appearance="Primary" Margin="0,0,8,0" Click="AddButton_Click" />
                 <ui:Button x:Name="SettingsButton" Content="Settings" Icon="{ui:SymbolIcon Settings24}" Click="SettingsButton_Click" />
             </StackPanel>
 

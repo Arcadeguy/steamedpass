@@ -50,45 +50,83 @@ internal static class CliRunner
 
     private static async Task<int> RunAddAsync(string[] args)
     {
-        string? name = GetArgValue(args, "--name");
-        string? aumid = GetArgValue(args, "--aumid");
+        bool all = args.Any(a => string.Equals(a, "--all", StringComparison.OrdinalIgnoreCase));
+        string[] names = GetArgValues(args, "--name");
+        string[] aumids = GetArgValues(args, "--aumid");
 
-        if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(aumid))
+        if (!all && names.Length == 0 && aumids.Length == 0)
         {
-            Console.Error.WriteLine("Specify --name \"<game name>\" or --aumid <AUMID>.");
+            Console.Error.WriteLine("Specify --name \"<game name>\" (repeatable), --aumid <AUMID> (repeatable), or --all.");
             return 1;
         }
 
-        IReadOnlyList<InstalledGame> games = GameScanner.GetInstalledGames();
-        InstalledGame? game = !string.IsNullOrEmpty(aumid)
-            ? games.FirstOrDefault(g => string.Equals(g.Aumid, aumid, StringComparison.OrdinalIgnoreCase))
-            : games.FirstOrDefault(g => string.Equals(g.Name, name, StringComparison.OrdinalIgnoreCase));
+        IReadOnlyList<InstalledGame> installedGames = GameScanner.GetInstalledGames();
+        var games = new List<InstalledGame>();
 
-        if (game is null)
+        if (all)
         {
-            Console.Error.WriteLine("No installed Game Pass app matched. Run 'steamedpass list' to see installed apps.");
+            games.AddRange(installedGames);
+        }
+        else
+        {
+            foreach (string aumid in aumids)
+            {
+                InstalledGame? match = installedGames.FirstOrDefault(g => string.Equals(g.Aumid, aumid, StringComparison.OrdinalIgnoreCase));
+                if (match is null)
+                {
+                    Console.Error.WriteLine($"No installed Game Pass app matched AUMID '{aumid}'.");
+                    return 1;
+                }
+
+                games.Add(match);
+            }
+
+            foreach (string name in names)
+            {
+                InstalledGame? match = installedGames.FirstOrDefault(g => string.Equals(g.Name, name, StringComparison.OrdinalIgnoreCase));
+                if (match is null)
+                {
+                    Console.Error.WriteLine($"No installed Game Pass app matched name '{name}'. Run 'steamedpass list' to see installed apps.");
+                    return 1;
+                }
+
+                games.Add(match);
+            }
+        }
+
+        games = games.Distinct().ToList();
+
+        if (games.Count == 0)
+        {
+            Console.Error.WriteLine("No installed Game Pass apps matched.");
             return 1;
         }
 
-        Console.WriteLine($"Adding '{game.Name}' to Steam...");
+        Console.WriteLine($"Adding {games.Count} app(s) to Steam: {string.Join(", ", games.Select(g => g.Name))}");
 
         try
         {
             string exePath = Environment.ProcessPath!;
             SteamedpassSettings settings = SteamedpassSettings.Load();
-            AddGameResult result = await AddGamePipeline.RunAsync(game, exePath, settings);
+            AddGamesResult result = await AddGamePipeline.RunAsync(games, exePath, settings);
 
-            Console.WriteLine($"Added to Steam: {result.AddedToSteam}");
             Console.WriteLine($"Steam restarted: {result.SteamRestarted}");
-            Console.WriteLine(result.DesktopShortcutPath is null
-                ? "Desktop shortcut: skipped (disabled in settings)"
-                : $"Desktop shortcut: {result.DesktopShortcutPath} (icon extracted: {result.DesktopIconExtracted})");
-            Console.WriteLine($"Steam library grid art installed: {result.GridArtInstalled}");
+            foreach (AddGameOutcome outcome in result.Games)
+            {
+                string desktopShortcutStatus = outcome.Result.DesktopShortcutPath is null
+                    ? "skipped (disabled in settings)"
+                    : $"{outcome.Result.DesktopShortcutPath} (icon extracted: {outcome.Result.DesktopIconExtracted})";
+
+                Console.WriteLine(
+                    $"- {outcome.Game.Name}: added={outcome.Result.AddedToSteam}, " +
+                    $"grid art installed={outcome.Result.GridArtInstalled}, desktop shortcut={desktopShortcutStatus}");
+            }
+
             return 0;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to add {Game} to Steam", game.Name);
+            Log.Error(ex, "Failed to add game(s) to Steam");
             Console.Error.WriteLine($"Error: {ex.Message}");
             Console.Error.WriteLine("See %AppData%\\steamedpass\\application.log for details.");
             return 1;
@@ -118,12 +156,27 @@ internal static class CliRunner
         return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
     }
 
+    private static string[] GetArgValues(string[] args, string flag)
+    {
+        var values = new List<string>();
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            if (string.Equals(args[i], flag, StringComparison.OrdinalIgnoreCase))
+            {
+                values.Add(args[i + 1]);
+            }
+        }
+
+        return values.ToArray();
+    }
+
     private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
         Console.WriteLine("  steamedpass list");
-        Console.WriteLine("  steamedpass add --name \"<game name>\"");
-        Console.WriteLine("  steamedpass add --aumid <AUMID>");
+        Console.WriteLine("  steamedpass add --name \"<game name>\" [--name \"<another game>\" ...]");
+        Console.WriteLine("  steamedpass add --aumid <AUMID> [--aumid <another AUMID> ...]");
+        Console.WriteLine("  steamedpass add --all");
         Console.WriteLine("  steamedpass config --steamgriddb-key <key>");
     }
 }

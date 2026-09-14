@@ -33,27 +33,37 @@ public static class SteamShortcuts
     /// Adds a new shortcut, or overwrites one whose AppName+Exe already match, and
     /// writes the result back to disk (after backing up the previous file).
     /// </summary>
-    public static void AddOrUpdateShortcut(string userDataDirectory, VDFEntry entry)
+    public static void AddOrUpdateShortcut(string userDataDirectory, VDFEntry entry) =>
+        AddOrUpdateShortcuts(userDataDirectory, new[] { entry });
+
+    /// <summary>
+    /// Adds/overwrites several shortcuts in one read-modify-write pass, so adding
+    /// multiple games only backs up and rewrites shortcuts.vdf once.
+    /// </summary>
+    public static void AddOrUpdateShortcuts(string userDataDirectory, IEnumerable<VDFEntry> entries)
     {
         VDFEntry[] shortcuts = ReadShortcuts(userDataDirectory);
 
-        bool updated = false;
-        for (int i = 0; i < shortcuts.Length; i++)
+        foreach (VDFEntry entry in entries)
         {
-            if (shortcuts[i].AppName == entry.AppName && shortcuts[i].Exe == entry.Exe)
+            bool updated = false;
+            for (int i = 0; i < shortcuts.Length; i++)
             {
-                entry.Index = shortcuts[i].Index;
-                shortcuts[i] = entry;
-                updated = true;
-                break;
+                if (shortcuts[i].AppName == entry.AppName && shortcuts[i].Exe == entry.Exe)
+                {
+                    entry.Index = shortcuts[i].Index;
+                    shortcuts[i] = entry;
+                    updated = true;
+                    break;
+                }
             }
-        }
 
-        if (!updated)
-        {
-            entry.Index = shortcuts.Length;
-            Array.Resize(ref shortcuts, shortcuts.Length + 1);
-            shortcuts[^1] = entry;
+            if (!updated)
+            {
+                entry.Index = shortcuts.Length;
+                Array.Resize(ref shortcuts, shortcuts.Length + 1);
+                shortcuts[^1] = entry;
+            }
         }
 
         string configDirectory = Path.Combine(userDataDirectory, "config");

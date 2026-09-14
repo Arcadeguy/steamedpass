@@ -67,19 +67,26 @@ one process and one `Main`.
 
 ### The add-game pipeline (`Steamedpass.Core/Pipeline/AddGamePipeline.cs`)
 
-Single async method both `CliRunner` and the GUI call, in this order:
-compute Steam's CRC32-based app ids (`SteamAppId`) → resolve/persist a VDF
-icon (`PackageIconResolver`) → write the shortcut entry into every Steam
-user's `shortcuts.vdf` (`SteamShortcuts`, one per `userdata/<id>` directory)
-→ restart Steam (`SteamProcess.RestartAsync`) so it picks up the change →
-install SteamGridDB grid art (`GridArtInstaller`, best-effort/optional) →
-extract a real icon straight from the AUMID via Shell API
-(`IconExtractor` + `IcoEncoder`) and author a `.url` desktop shortcut
+Single async method both `CliRunner` and the GUI call, taking a *batch* of
+one or more `InstalledGame`s (the GUI's grid has a checkbox column so
+multiple apps can be selected at once, à la UWPHook), in this order:
+for every game, compute Steam's CRC32-based app ids (`SteamAppId`) and
+resolve/persist a VDF icon (`PackageIconResolver`) → write all the games'
+shortcut entries into every Steam user's `shortcuts.vdf` in one
+read-modify-write pass per user (`SteamShortcuts.AddOrUpdateShortcuts`, one
+per `userdata/<id>` directory) → restart Steam once for the whole batch
+(`SteamProcess.RestartAsync`) so it picks up the change → per game, install
+SteamGridDB grid art (`GridArtInstaller`, best-effort/optional) and extract
+a real icon straight from the AUMID via Shell API (`IconExtractor` +
+`IcoEncoder`) and author a `.url` desktop shortcut
 (`DesktopShortcutWriter`), if enabled in settings. Keep new steps in this
 same order-dependent flow rather than parallelizing them — later steps
-depend on ids/state computed earlier (e.g. the shortcut must exist before
-Steam is restarted; the exe path baked into the shortcut is
-`steamedpassExePath`, i.e. this same running exe).
+depend on ids/state computed earlier (e.g. every shortcut must exist before
+Steam is restarted; the exe path baked into each shortcut is
+`steamedpassExePath`, i.e. this same running exe). `AddGamePipeline.RunAsync`
+returns an `AddGamesResult` (one `SteamRestarted` flag for the batch, plus a
+per-game `AddGameOutcome` list) rather than a per-game restart flag, since
+Steam is only restarted once regardless of batch size.
 
 ### Steam app-id scheme (`Steamedpass.Core/Steam/SteamAppId.cs`)
 
