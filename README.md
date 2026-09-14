@@ -82,7 +82,7 @@ into source control). Options mirror UWPHook's settings page:
 | Setting | Notes |
 |---|---|
 | SteamGridDB API key + Style/Type/NSFW/Humor filters | Controls Library grid art downloads |
-| Steam category tags | Comma-separated, applied to every shortcut (default `READY TO PLAY,XBOX`) |
+| Steam category tags | Comma-separated, applied to every shortcut (default `GAMEPASS`) |
 | Log level | Error / Debug / Trace, written to `%AppData%\steamedpass\application.log` |
 | Poll seconds | How often to check whether a launched game is still running |
 | Stream mode | Shows a full-screen cover window for ~10s before launch |
