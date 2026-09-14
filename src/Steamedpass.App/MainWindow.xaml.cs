@@ -65,8 +65,14 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private async Task RefreshGamesAsync()
     {
+        // Only cover the grid with the centered spinner on the very first load, when
+        // there's nothing behind it yet but an empty header row. A later refresh already
+        // has rows to show, so just flash the thin progress bar above the grid instead.
+        bool isInitialLoad = GamesList.ItemsSource is null;
+
         StatusText.Text = "Scanning installed apps...";
         RefreshProgressBar.Visibility = Visibility.Visible;
+        LoadingOverlay.Visibility = isInitialLoad ? Visibility.Visible : Visibility.Collapsed;
         IsEnabled = false;
 
         try
@@ -97,6 +103,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         finally
         {
             RefreshProgressBar.Visibility = Visibility.Collapsed;
+            LoadingOverlay.Visibility = Visibility.Collapsed;
             IsEnabled = true;
         }
     }
@@ -209,9 +216,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private async void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        List<InstalledGame> selectedGames = GamesList.Items.OfType<SelectableGame>()
+        List<SelectableGame> selectedGames = GamesList.Items.OfType<SelectableGame>()
             .Where(g => g.IsSelected)
-            .Select(g => g.Game)
             .ToList();
 
         if (selectedGames.Count == 0)
@@ -229,7 +235,17 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         {
             string exePath = Environment.ProcessPath!;
             SteamedpassSettings settings = SteamedpassSettings.Load();
-            AddGamesResult result = await AddGamePipeline.RunAsync(selectedGames, exePath, settings);
+            AddGamesResult result = await AddGamePipeline.RunAsync(
+                selectedGames.Select(g => g.Game).ToList(), exePath, settings);
+
+            foreach (SelectableGame selectableGame in selectedGames)
+            {
+                AddGameOutcome? outcome = result.Games.FirstOrDefault(o => o.Game == selectableGame.Game);
+                if (outcome is { Result.AddedToSteam: true })
+                {
+                    selectableGame.IsAdded = true;
+                }
+            }
 
             int gridArtCount = result.Games.Count(g => g.Result.GridArtInstalled);
             int desktopShortcutCount = result.Games.Count(g => g.Result.DesktopShortcutPath is not null);

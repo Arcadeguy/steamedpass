@@ -10,6 +10,7 @@ namespace Steamedpass.App;
 public sealed class SelectableGame(InstalledGame game) : INotifyPropertyChanged
 {
     private bool _isSelected;
+    private bool _isAdded;
 
     public InstalledGame Game { get; } = game;
 
@@ -18,7 +19,20 @@ public sealed class SelectableGame(InstalledGame game) : INotifyPropertyChanged
     public string Aumid => Game.Aumid;
 
     /// <summary>Whether this game already has a matching shortcut in Steam.</summary>
-    public bool IsAdded { get; init; }
+    public bool IsAdded
+    {
+        get => _isAdded;
+        set
+        {
+            if (_isAdded == value)
+            {
+                return;
+            }
+
+            _isAdded = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsAdded)));
+        }
+    }
 
     /// <summary>Path to a thumbnail image for this game, or null if none was found.</summary>
     public string? IconPath { get; init; }

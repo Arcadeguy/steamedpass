@@ -103,47 +103,57 @@
                          Foreground="{DynamicResource AccentButtonBackground}"
                          Margin="0,0,0,8" Visibility="Collapsed" />
 
-            <ui:Card Grid.Row="2" Padding="0">
-                <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent">
-                    <ui:ListView.View>
-                        <ui:GridView ColumnHeaderContainerStyle="{StaticResource GamesGridHeaderStyle}">
-                            <GridViewColumn x:Name="SelectColumn" Width="60">
-                                <GridViewColumn.Header>
-                                    <CheckBox x:Name="SelectAllCheckBox" Click="SelectAllCheckBox_Click" />
-                                </GridViewColumn.Header>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn x:Name="AddedColumn" Header="Added" Width="60">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ui:SymbolIcon Symbol="CheckmarkCircle24" Filled="True"
-                                                       Foreground="{DynamicResource SystemFillColorSuccessBrush}"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                       Visibility="{Binding IsAdded, Converter={StaticResource BoolToVis}}"
-                                                       ToolTip="Already added to Steam" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn x:Name="IconColumn" Header="Icon" Width="48">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Image Source="{Binding IconPath}" Width="28" Height="28"
-                                               Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn x:Name="NameColumn" Header="Name" DisplayMemberBinding="{Binding Name}" Width="240" />
-                            <GridViewColumn x:Name="ExecutableColumn" Header="Executable" DisplayMemberBinding="{Binding Executable}" Width="200" />
-                            <GridViewColumn x:Name="AumidColumn" Header="AUMID" DisplayMemberBinding="{Binding Aumid}" Width="260" />
-                        </ui:GridView>
-                    </ui:ListView.View>
-                </ui:ListView>
-            </ui:Card>
+            <Grid Grid.Row="2">
+                <ui:Card Padding="0">
+                    <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent">
+                        <ui:ListView.View>
+                            <ui:GridView ColumnHeaderContainerStyle="{StaticResource GamesGridHeaderStyle}">
+                                <GridViewColumn x:Name="SelectColumn" Width="60">
+                                    <GridViewColumn.Header>
+                                        <CheckBox x:Name="SelectAllCheckBox" Click="SelectAllCheckBox_Click" />
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                      IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn x:Name="AddedColumn" Header="Added" Width="60">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:SymbolIcon Symbol="CheckmarkCircle24" Filled="True"
+                                                           Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           Visibility="{Binding IsAdded, Converter={StaticResource BoolToVis}}"
+                                                           ToolTip="Already added to Steam" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn x:Name="IconColumn" Header="Icon" Width="48">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Source="{Binding IconPath}" Width="28" Height="28"
+                                                   Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn x:Name="NameColumn" Header="Name" DisplayMemberBinding="{Binding Name}" Width="240" />
+                                <GridViewColumn x:Name="ExecutableColumn" Header="Executable" DisplayMemberBinding="{Binding Executable}" Width="200" />
+                                <GridViewColumn x:Name="AumidColumn" Header="AUMID" DisplayMemberBinding="{Binding Aumid}" Width="260" />
+                            </ui:GridView>
+                        </ui:ListView.View>
+                    </ui:ListView>
+                </ui:Card>
+
+                <Border x:Name="LoadingOverlay" Background="{DynamicResource ApplicationBackgroundBrush}"
+                        CornerRadius="4" Visibility="Collapsed">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ui:ProgressRing IsIndeterminate="True" Width="32" Height="32" Margin="0,0,0,12" />
+                        <TextBlock Text="Scanning installed apps..." HorizontalAlignment="Center" Opacity="0.8" />
+                    </StackPanel>
+                </Border>
+            </Grid>
 
             <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,14,0,0">
                 <ui:Button x:Name="RefreshButton" Content="Refresh" Icon="{ui:SymbolIcon ArrowClockwise24}" Margin="0,0,8,0" Click="RefreshButton_Click" />
