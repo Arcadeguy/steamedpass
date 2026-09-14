@@ -17,6 +17,12 @@ public sealed class SelectableGame(InstalledGame game) : INotifyPropertyChanged
     public string Executable => Game.Executable;
     public string Aumid => Game.Aumid;
 
+    /// <summary>Whether this game already has a matching shortcut in Steam.</summary>
+    public bool IsAdded { get; init; }
+
+    /// <summary>Path to a thumbnail image for this game, or null if none was found.</summary>
+    public string? IconPath { get; init; }
+
     public bool IsSelected
     {
         get => _isSelected;

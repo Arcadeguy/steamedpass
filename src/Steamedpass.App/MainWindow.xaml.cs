@@ -4,8 +4,10 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Serilog;
 using Steamedpass.Core.Discovery;
+using Steamedpass.Core.Icons;
 using Steamedpass.Core.Pipeline;
 using Steamedpass.Core.Settings;
+using Steamedpass.Core.Steam;
 
 namespace Steamedpass.App;
 
@@ -26,13 +28,13 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         Title = titleWithVersion;
         AppTitleBar.Title = titleWithVersion;
 
-        Loaded += (_, _) =>
+        Loaded += async (_, _) =>
         {
-            RefreshGames();
+            await RefreshGamesAsync();
 
             // The ListView hasn't finished its first layout pass yet at this point,
             // so the other columns' ActualWidth isn't reliable until it settles.
-            Dispatcher.BeginInvoke(ResizeAumidColumn, System.Windows.Threading.DispatcherPriority.Loaded);
+            _ = Dispatcher.BeginInvoke(ResizeAumidColumn, System.Windows.Threading.DispatcherPriority.Loaded);
         };
         GamesList.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(GamesList_HeaderClick));
         GamesList.SizeChanged += (_, _) => ResizeAumidColumn();
@@ -41,7 +43,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         // reaches the right edge - re-measure it whenever an earlier column is resized.
         DependencyPropertyDescriptor widthDescriptor =
             DependencyPropertyDescriptor.FromProperty(GridViewColumn.WidthProperty, typeof(GridViewColumn));
-        foreach (GridViewColumn column in new[] { SelectColumn, NameColumn, ExecutableColumn })
+        foreach (GridViewColumn column in new[] { SelectColumn, AddedColumn, IconColumn, NameColumn, ExecutableColumn })
         {
             widthDescriptor.AddValueChanged(column, (_, _) => ResizeAumidColumn());
         }
@@ -49,7 +51,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private void ResizeAumidColumn()
     {
-        double used = SelectColumn.ActualWidth + NameColumn.ActualWidth + ExecutableColumn.ActualWidth;
+        double used = SelectColumn.ActualWidth + AddedColumn.ActualWidth + IconColumn.ActualWidth +
+            NameColumn.ActualWidth + ExecutableColumn.ActualWidth;
         double available = GamesList.ActualWidth - used - SystemParameters.VerticalScrollBarWidth - 8;
 
         if (available > 120)
@@ -58,20 +61,34 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
     }
 
-    private void RefreshButton_Click(object sender, RoutedEventArgs e) => RefreshGames();
+    private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshGamesAsync();
 
-    private void RefreshGames()
+    private async Task RefreshGamesAsync()
     {
         StatusText.Text = "Scanning installed apps...";
+        RefreshProgressBar.Visibility = Visibility.Visible;
         IsEnabled = false;
 
         try
         {
-            IReadOnlyList<InstalledGame> games = GameScanner.GetInstalledGames();
-            GamesList.ItemsSource = games.Select(g => new SelectableGame(g)).ToList();
+            List<SelectableGame> selectableGames = await Task.Run(() =>
+            {
+                IReadOnlyList<InstalledGame> games = GameScanner.GetInstalledGames();
+                HashSet<string> addedNames = GetAddedAppNames();
+
+                return games
+                    .Select(g => new SelectableGame(g)
+                    {
+                        IsAdded = addedNames.Contains(g.Name),
+                        IconPath = PackageIconResolver.FindThumbnail(g.LogoDirectory),
+                    })
+                    .ToList();
+            });
+
+            GamesList.ItemsSource = selectableGames;
             ApplyCurrentSort();
             SelectAllCheckBox.IsChecked = false;
-            StatusText.Text = $"{games.Count} app(s) found.";
+            StatusText.Text = $"{selectableGames.Count} app(s) found.";
         }
         catch (Exception ex)
         {
@@ -79,7 +96,32 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
         finally
         {
+            RefreshProgressBar.Visibility = Visibility.Collapsed;
             IsEnabled = true;
+        }
+    }
+
+    /// <summary>
+    /// Best-effort: which installed games this exact steamedpass.exe has already
+    /// added to Steam. Returns an empty set (rather than throwing) if Steam isn't
+    /// found or its shortcuts can't be read, so a scan never fails because of it.
+    /// </summary>
+    private static HashSet<string> GetAddedAppNames()
+    {
+        try
+        {
+            string? steamFolder = SteamPaths.GetSteamFolder();
+            if (steamFolder is null)
+            {
+                return new HashSet<string>();
+            }
+
+            string[] userDataDirectories = SteamPaths.GetUserDataDirectories(steamFolder);
+            return SteamShortcuts.GetAddedAppNames(userDataDirectories, Environment.ProcessPath!);
+        }
+        catch
+        {
+            return new HashSet<string>();
         }
     }
 

@@ -111,15 +111,6 @@
                                 <ComboBox x:Name="ResolutionCombo" Grid.Column="2" />
                             </Grid>
 
-                            <Grid Margin="0,0,0,14">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="140" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Export with these Steam category tags" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                <ui:TextBox x:Name="TagsBox" Grid.Column="1" />
-                            </Grid>
-
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />

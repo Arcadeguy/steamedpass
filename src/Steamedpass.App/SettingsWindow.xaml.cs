@@ -71,8 +71,6 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
         HumorCombo.ItemsSource = SteamGridDbOptions.Humor;
         HumorCombo.SelectedIndex = _settings.SteamGridDbHumor;
 
-        TagsBox.Text = _settings.Tags;
-
         _isInitializing = false;
     }
 
@@ -105,7 +103,6 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
         _settings.SteamGridDbType = TypeCombo.SelectedIndex;
         _settings.SteamGridDbNsfw = NsfwCombo.SelectedIndex;
         _settings.SteamGridDbHumor = HumorCombo.SelectedIndex;
-        _settings.Tags = TagsBox.Text;
 
         _settings.Save();
         AppLog.SetLevel(_settings.LogLevel);

@@ -44,6 +44,18 @@ public static class PackageIconResolver
         }
     }
 
+    /// <summary>
+    /// Finds the widest square tile image in a UWP package's logo directory for
+    /// display purposes (e.g. a GUI thumbnail), without copying/persisting it -
+    /// unlike <see cref="ResolveAndPersist"/>, the source path doesn't need to
+    /// survive package updates/uninstalls here. Returns null if none was found.
+    /// </summary>
+    public static string? FindThumbnail(string logoDirectory)
+    {
+        string widest = FindWidestSquareIcon(logoDirectory);
+        return string.IsNullOrEmpty(widest) ? null : widest;
+    }
+
     private static string FindWidestSquareIcon(string logoDirectory)
     {
         var images = new List<string>();

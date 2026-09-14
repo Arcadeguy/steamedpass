@@ -27,8 +27,6 @@ public static class AddGamePipeline
             throw new ArgumentException("Specify at least one game to add.", nameof(games));
         }
 
-        string[] tags = settings.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
         string? steamFolder = SteamPaths.GetSteamFolder();
         if (steamFolder is null)
         {
@@ -65,7 +63,7 @@ public static class AddGamePipeline
                 Devkit = 0,
                 DevkitGameID = string.Empty,
                 LastPlayTime = (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                Tags = tags,
+                Tags = Array.Empty<string>(),
             };
 
             prepared.Add((game, entry, legacyAppId, shortcutId64));

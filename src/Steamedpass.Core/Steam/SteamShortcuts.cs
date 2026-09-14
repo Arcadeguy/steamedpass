@@ -30,6 +30,30 @@ public static class SteamShortcuts
     }
 
     /// <summary>
+    /// The AppName of every shortcut, across all given Steam users, whose Exe
+    /// matches <paramref name="exePath"/> - i.e. every game this exact copy of
+    /// steamedpass has already added to Steam. Used to flag already-added games
+    /// in the GUI's list.
+    /// </summary>
+    public static HashSet<string> GetAddedAppNames(IEnumerable<string> userDataDirectories, string exePath)
+    {
+        var names = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (string userDataDirectory in userDataDirectories)
+        {
+            foreach (VDFEntry entry in ReadShortcuts(userDataDirectory))
+            {
+                if (entry.Exe == exePath)
+                {
+                    names.Add(entry.AppName);
+                }
+            }
+        }
+
+        return names;
+    }
+
+    /// <summary>
     /// Adds a new shortcut, or overwrites one whose AppName+Exe already match, and
     /// writes the result back to disk (after backing up the previous file).
     /// </summary>

@@ -23,9 +23,6 @@ public sealed class SteamedpassSettings
     /// <summary>Index into SteamGridDbOptions.Humor.</summary>
     public int SteamGridDbHumor { get; set; }
 
-    /// <summary>Comma-separated Steam category tags applied to every shortcut.</summary>
-    public string Tags { get; set; } = "GAMEPASS";
-
     /// <summary>0 = Error, 1 = Debug, 2 = Verbose/Trace.</summary>
     public int LogLevel { get; set; }
 

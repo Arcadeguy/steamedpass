@@ -13,6 +13,7 @@
         WindowBackdropType="Mica"
         WindowStartupLocation="CenterScreen">
     <ui:FluentWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="GamesGridHeaderStyle" TargetType="GridViewColumnHeader">
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -89,6 +90,7 @@
         <Grid Grid.Row="1" Margin="20,8,20,20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -96,7 +98,12 @@
 
             <ui:TextBlock Grid.Row="0" Text="List of installed UWP apps" FontTypography="BodyStrong" Margin="0,0,0,8" />
 
-            <ui:Card Grid.Row="1" Padding="0">
+            <ProgressBar x:Name="RefreshProgressBar" Grid.Row="1" IsIndeterminate="True" Height="3"
+                         BorderThickness="0" Background="Transparent"
+                         Foreground="{DynamicResource AccentButtonBackground}"
+                         Margin="0,0,0,8" Visibility="Collapsed" />
+
+            <ui:Card Grid.Row="2" Padding="0">
                 <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent">
                     <ui:ListView.View>
                         <ui:GridView ColumnHeaderContainerStyle="{StaticResource GamesGridHeaderStyle}">
@@ -111,6 +118,25 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
+                            <GridViewColumn x:Name="AddedColumn" Header="Added" Width="60">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ui:SymbolIcon Symbol="CheckmarkCircle24" Filled="True"
+                                                       Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Visibility="{Binding IsAdded, Converter={StaticResource BoolToVis}}"
+                                                       ToolTip="Already added to Steam" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn x:Name="IconColumn" Header="Icon" Width="48">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding IconPath}" Width="28" Height="28"
+                                               Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                             <GridViewColumn x:Name="NameColumn" Header="Name" DisplayMemberBinding="{Binding Name}" Width="240" />
                             <GridViewColumn x:Name="ExecutableColumn" Header="Executable" DisplayMemberBinding="{Binding Executable}" Width="200" />
                             <GridViewColumn x:Name="AumidColumn" Header="AUMID" DisplayMemberBinding="{Binding Aumid}" Width="260" />
@@ -119,13 +145,13 @@
                 </ui:ListView>
             </ui:Card>
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,14,0,0">
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,14,0,0">
                 <ui:Button x:Name="RefreshButton" Content="Refresh" Icon="{ui:SymbolIcon ArrowClockwise24}" Margin="0,0,8,0" Click="RefreshButton_Click" />
                 <ui:Button x:Name="AddButton" Content="Add Selected to Steam" Icon="{ui:SymbolIcon Add24}" Appearance="Primary" Margin="0,0,8,0" Click="AddButton_Click" />
                 <ui:Button x:Name="SettingsButton" Content="Settings" Icon="{ui:SymbolIcon Settings24}" Click="SettingsButton_Click" />
             </StackPanel>
 
-            <TextBlock x:Name="StatusText" Grid.Row="3" Margin="0,10,0,0" TextWrapping="Wrap" Opacity="0.8" />
+            <TextBlock x:Name="StatusText" Grid.Row="4" Margin="0,10,0,0" TextWrapping="Wrap" Opacity="0.8" />
         </Grid>
     </Grid>
 </ui:FluentWindow>
