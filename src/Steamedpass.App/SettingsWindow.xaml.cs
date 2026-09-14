@@ -13,7 +13,7 @@ namespace Steamedpass.App;
 /// Settings page mirroring UWPHook's SettingsWindow
 /// (https://github.com/BrianLima/UWPHook), MIT License, Copyright (c) 2016 Brian Lima.
 /// </summary>
-public partial class SettingsWindow : Window
+public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
 {
     private readonly SteamedpassSettings _settings;
 

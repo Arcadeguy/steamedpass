@@ -33,6 +33,7 @@ public partial class App : Application
         }
 
         base.OnStartup(e);
+        Wpf.Ui.Appearance.ApplicationThemeManager.ApplySystemTheme();
         new MainWindow().Show();
     }
 }
