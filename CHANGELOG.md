@@ -2,6 +2,26 @@
 
 All notable changes to SteamedPass are documented in this file.
 
+## [1.0.2] - 2026-09-13
+
+### Added
+
+- The games grid now shows each app's icon (resolved from its own package
+  logo assets) and flags apps that already have a matching Steam shortcut,
+  so it's easy to see what's already been added.
+- Scanning installed apps (on launch and on **Refresh**) now runs in the
+  background with a progress indicator instead of freezing the window.
+- A GitHub Actions workflow builds and attaches a release archive
+  automatically whenever a version tag is pushed.
+
+### Removed
+
+- The "Steam category tags" setting. Modern Steam no longer reads
+  `shortcuts.vdf`'s `tags` field for categorization - it keeps that in a
+  separate, undocumented Collections store - so the setting never actually
+  did anything. Removed rather than leave a non-functional control in
+  Settings.
+
 ## [1.0.0] - 2026-09-13
 
 Initial release.

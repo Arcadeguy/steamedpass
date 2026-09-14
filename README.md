@@ -70,12 +70,14 @@ and paste it into Settings to enable Library grid/hero/logo art.
 
 ## Using the GUI
 
-Run `steamedpass.exe` with no arguments. Check the box next to one or more
-games in the list (or use the header checkbox to select/deselect all) and
-click **Add Selected to Steam** — Steam is only restarted once no matter how
-many games you selected. Click **Settings** to configure the SteamGridDB API
-key, language/resolution overrides, log level, category tags, and other
-options (see below).
+Run `steamedpass.exe` with no arguments. The games grid shows each app's
+icon and whether it's already been added to Steam, and scans in the
+background with a progress indicator (on launch and whenever you click
+**Refresh**) rather than freezing the window. Check the box next to one or
+more games (or use the header checkbox to select/deselect all) and click
+**Add Selected to Steam** — Steam is only restarted once no matter how many
+games you selected. Click **Settings** to configure the SteamGridDB API key,
+language/resolution overrides, log level, and other options (see below).
 
 ## Using the CLI
 
@@ -103,7 +105,6 @@ into source control). Options mirror UWPHook's settings page:
 | Setting | Notes |
 |---|---|
 | SteamGridDB API key + Style/Type/NSFW/Humor filters | Controls Library grid art downloads |
-| Steam category tags | Comma-separated, applied to every shortcut (default `GAMEPASS`) |
 | Create desktop shortcut | On by default; extracts a real icon and authors the `.url` shortcut |
 | Theme | System / Light / Dark |
 | Log level | Error / Debug / Trace, written to `%AppData%\steamedpass\application.log` |
