@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build and release (e.g. v1.0.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Determine tag
+        id: tag
+        shell: bash
+        run: echo "name=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tag.outputs.name }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish
+        run: dotnet publish src/Steamedpass.App/Steamedpass.App.csproj -c Release -o publish
+
+      - name: Zip archive
+        shell: pwsh
+        run: Compress-Archive -Path publish/* -DestinationPath "SteamedPass-${{ steps.tag.outputs.name }}-win.zip"
+
+      - name: Create GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.tag.outputs.name }}" "SteamedPass-${{ steps.tag.outputs.name }}-win.zip" \
+            --title "${{ steps.tag.outputs.name }}" \
+            --generate-notes
