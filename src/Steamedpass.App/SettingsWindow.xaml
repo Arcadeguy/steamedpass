@@ -202,9 +202,7 @@
                                 <ui:TextBlock Text="About" Style="{StaticResource SectionHeaderTextStyle}" />
                             </Border>
                             <StackPanel Margin="16" HorizontalAlignment="Center">
-                                <Border Width="140" Height="140" CornerRadius="16" ClipToBounds="True" HorizontalAlignment="Center" Margin="0,4,0,12">
-                                    <Image Source="Resources/SteamedPass.png" Stretch="UniformToFill" />
-                                </Border>
+                                <Image Source="Resources/SteamedPass.png" Width="140" Height="140" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,4,0,12" />
                                 <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,12">
                                     <Run Text="steamedpass adds Game Pass / Microsoft Store games to Steam as non-Steam shortcuts, with working desktop icons and Library art." />
                                 </TextBlock>
