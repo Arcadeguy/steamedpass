@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using Steamedpass.Core.Display;
 using Steamedpass.Core.GridArt;
 using Steamedpass.Core.Logging;
@@ -16,11 +17,23 @@ namespace Steamedpass.App;
 public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
 {
     private readonly SteamedpassSettings _settings;
+    private readonly string _originalThemeMode;
+    private bool _isInitializing = true;
+    private bool _saved;
 
     public SettingsWindow()
     {
         InitializeComponent();
+        Closing += SettingsWindow_Closing;
         _settings = SteamedpassSettings.Load();
+        _originalThemeMode = _settings.ThemeMode;
+
+        ThemeCombo.SelectedIndex = _settings.ThemeMode switch
+        {
+            "Light" => 1,
+            "Dark" => 2,
+            _ => 0,
+        };
 
         CreateDesktopShortcutCheck.IsChecked = _settings.CreateDesktopShortcut;
 
@@ -58,10 +71,26 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
         HumorCombo.SelectedIndex = _settings.SteamGridDbHumor;
 
         TagsBox.Text = _settings.Tags;
+
+        _isInitializing = false;
     }
+
+    private void ThemeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializing)
+        {
+            return;
+        }
+
+        ThemeManager.Apply(GetSelectedThemeMode());
+    }
+
+    private string GetSelectedThemeMode() =>
+        (ThemeCombo.SelectedItem as ComboBoxItem)?.Content as string ?? "System";
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
+        _settings.ThemeMode = GetSelectedThemeMode();
         _settings.CreateDesktopShortcut = CreateDesktopShortcutCheck.IsChecked == true;
         _settings.ChangeLanguage = ChangeLanguageCheck.IsChecked == true;
         _settings.TargetLanguage = LanguageCombo.SelectedItem?.ToString() ?? string.Empty;
@@ -80,10 +109,19 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
         _settings.Save();
         AppLog.SetLevel(_settings.LogLevel);
 
+        _saved = true;
         Close();
     }
 
     private void CancelButton_Click(object sender, RoutedEventArgs e) => Close();
+
+    private void SettingsWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        if (!_saved)
+        {
+            ThemeManager.Apply(_originalThemeMode);
+        }
+    }
 
     private void GetApiKeyButton_Click(object sender, RoutedEventArgs e) =>
         OpenUrl("https://www.steamgriddb.com/profile/preferences/api");

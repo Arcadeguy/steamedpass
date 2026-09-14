@@ -48,6 +48,9 @@ public sealed class SteamedpassSettings
     /// <summary>Whether adding a game also authors a desktop shortcut for it.</summary>
     public bool CreateDesktopShortcut { get; set; } = true;
 
+    /// <summary>"System", "Light", or "Dark".</summary>
+    public string ThemeMode { get; set; } = "System";
+
     private static string SettingsPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "steamedpass", "settings.json");

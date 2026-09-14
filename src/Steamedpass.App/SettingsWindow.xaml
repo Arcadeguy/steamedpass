@@ -9,19 +9,14 @@
         WindowBackdropType="Mica"
         WindowStartupLocation="CenterOwner">
     <ui:FluentWindow.Resources>
-        <Style x:Key="SectionHeaderStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
-            <Setter Property="CornerRadius" Value="6,6,0,0" />
-            <Setter Property="Padding" Value="14,9" />
-        </Style>
-        <Style x:Key="SectionHeaderTextStyle" TargetType="ui:TextBlock">
-            <Setter Property="FontTypography" Value="BodyStrong" />
-            <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
-        </Style>
         <Style x:Key="RowLabelStyle" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Margin" Value="0,0,12,0" />
+        </Style>
+        <Style x:Key="SectionLabelStyle" TargetType="ui:TextBlock">
+            <Setter Property="FontTypography" Value="BodyStrong" />
+            <Setter Property="Margin" Value="0,0,0,8" />
         </Style>
     </ui:FluentWindow.Resources>
 
@@ -50,144 +45,149 @@
                 <StackPanel Grid.Column="0">
 
                     <!-- Settings card -->
-                    <ui:Card Padding="0" Margin="0,0,0,16">
+                    <ui:TextBlock Text="Settings" Style="{StaticResource SectionLabelStyle}" />
+                    <ui:Card Margin="0,0,0,16">
                         <StackPanel>
-                            <Border Style="{StaticResource SectionHeaderStyle}">
-                                <ui:TextBlock Text="Settings" Style="{StaticResource SectionHeaderTextStyle}" />
-                            </Border>
-                            <StackPanel Margin="16">
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:ToggleSwitch x:Name="CreateDesktopShortcutCheck" Grid.Column="0" Margin="0,0,12,0" />
-                                    <TextBlock Text="Create a desktop shortcut when adding a game to Steam" Style="{StaticResource RowLabelStyle}" Grid.Column="1" Margin="0" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="App theme" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ComboBox x:Name="ThemeCombo" Grid.Column="1" SelectionChanged="ThemeCombo_SelectionChanged">
+                                    <ComboBoxItem Content="System" />
+                                    <ComboBoxItem Content="Light" />
+                                    <ComboBoxItem Content="Dark" />
+                                </ComboBox>
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:ToggleSwitch x:Name="ChangeLanguageCheck" Grid.Column="0" Margin="0,0,12,0" />
-                                    <TextBlock Text="Override the game's UI language" Style="{StaticResource RowLabelStyle}" Grid.Column="1" />
-                                    <ComboBox x:Name="LanguageCombo" Grid.Column="2" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:ToggleSwitch x:Name="CreateDesktopShortcutCheck" Grid.Column="0" Margin="0,0,12,0" />
+                                <TextBlock Text="Create a desktop shortcut when adding a game to Steam" Style="{StaticResource RowLabelStyle}" Grid.Column="1" Margin="0" />
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Check if the launched game is still running every" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                    <ComboBox x:Name="SecondsCombo" Grid.Column="1" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <ui:ToggleSwitch x:Name="ChangeLanguageCheck" Grid.Column="0" Margin="0,0,12,0" />
+                                <TextBlock Text="Override the game's UI language" Style="{StaticResource RowLabelStyle}" Grid.Column="1" />
+                                <ComboBox x:Name="LanguageCombo" Grid.Column="2" />
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:ToggleSwitch x:Name="StreamModeCheck" Grid.Column="0" Margin="0,0,12,0" />
-                                    <TextBlock Text="Stream mode (show a full-screen cover window for ~10s before launching)" Style="{StaticResource RowLabelStyle}" Grid.Column="1" Margin="0" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Check if the launched game is still running every" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ComboBox x:Name="SecondsCombo" Grid.Column="1" />
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:ToggleSwitch x:Name="ChangeResolutionCheck" Grid.Column="0" Margin="0,0,12,0" />
-                                    <TextBlock Text="Change display resolution before launching" Style="{StaticResource RowLabelStyle}" Grid.Column="1" />
-                                    <ComboBox x:Name="ResolutionCombo" Grid.Column="2" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:ToggleSwitch x:Name="StreamModeCheck" Grid.Column="0" Margin="0,0,12,0" />
+                                <TextBlock Text="Stream mode (show a full-screen cover window for ~10s before launching)" Style="{StaticResource RowLabelStyle}" Grid.Column="1" Margin="0" />
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Export with these Steam category tags" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                    <ui:TextBox x:Name="TagsBox" Grid.Column="1" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <ui:ToggleSwitch x:Name="ChangeResolutionCheck" Grid.Column="0" Margin="0,0,12,0" />
+                                <TextBlock Text="Change display resolution before launching" Style="{StaticResource RowLabelStyle}" Grid.Column="1" />
+                                <ComboBox x:Name="ResolutionCombo" Grid.Column="2" />
+                            </Grid>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Define log severity level" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                    <ComboBox x:Name="LogLevelCombo" Grid.Column="1">
-                                        <ComboBoxItem Content="Error" />
-                                        <ComboBoxItem Content="Debug" />
-                                        <ComboBoxItem Content="Trace" />
-                                    </ComboBox>
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Export with these Steam category tags" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ui:TextBox x:Name="TagsBox" Grid.Column="1" />
+                            </Grid>
 
-                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Define log severity level" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ComboBox x:Name="LogLevelCombo" Grid.Column="1">
+                                    <ComboBoxItem Content="Error" />
+                                    <ComboBoxItem Content="Debug" />
+                                    <ComboBoxItem Content="Trace" />
+                                </ComboBox>
+                            </Grid>
+
                         </StackPanel>
                     </ui:Card>
 
                     <!-- SteamGridDB card -->
-                    <ui:Card Padding="0" Margin="0,0,0,16">
+                    <ui:TextBlock Text="SteamGridDB (Library grid art)" Style="{StaticResource SectionLabelStyle}" />
+                    <ui:Card Margin="0,0,0,16">
                         <StackPanel>
-                            <Border Style="{StaticResource SectionHeaderStyle}">
-                                <ui:TextBlock Text="SteamGridDB (Library grid art)" Style="{StaticResource SectionHeaderTextStyle}" />
-                            </Border>
-                            <StackPanel Margin="16">
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:Button Grid.Column="0" Icon="{ui:SymbolIcon Key24}" ToolTip="Go to SteamGridDB.com to generate a new key" Click="GetApiKeyButton_Click" Margin="0,0,12,0" />
-                                    <TextBlock Text="API key" Style="{StaticResource RowLabelStyle}" Grid.Column="1" />
-                                    <ui:PasswordBox x:Name="ApiKeyBox" Grid.Column="2" PlaceholderText="SteamGridDB API key" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:Button Grid.Column="0" Icon="{ui:SymbolIcon Key24}" ToolTip="Go to SteamGridDB.com to generate a new key" Click="GetApiKeyButton_Click" Margin="0,0,12,0" />
+                                <TextBlock Text="API key" Style="{StaticResource RowLabelStyle}" Grid.Column="1" />
+                                <ui:PasswordBox x:Name="ApiKeyBox" Grid.Column="2" PlaceholderText="SteamGridDB API key" />
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Artwork style" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                    <ComboBox x:Name="StyleCombo" Grid.Column="1" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Artwork style" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ComboBox x:Name="StyleCombo" Grid.Column="1" />
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Artwork type" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                    <ComboBox x:Name="TypeCombo" Grid.Column="1" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Artwork type" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ComboBox x:Name="TypeCombo" Grid.Column="1" />
+                            </Grid>
 
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Artwork NSFW" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                    <ComboBox x:Name="NsfwCombo" Grid.Column="1" />
-                                </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Artwork NSFW" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ComboBox x:Name="NsfwCombo" Grid.Column="1" />
+                            </Grid>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="140" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Artwork humorous" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
-                                    <ComboBox x:Name="HumorCombo" Grid.Column="1" />
-                                </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="140" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Artwork humorous" Style="{StaticResource RowLabelStyle}" Grid.Column="0" />
+                                <ComboBox x:Name="HumorCombo" Grid.Column="1" />
+                            </Grid>
 
-                            </StackPanel>
                         </StackPanel>
                     </ui:Card>
 
@@ -196,36 +196,28 @@
                 <!-- Right column -->
                 <StackPanel Grid.Column="2">
 
-                    <ui:Card Padding="0" Margin="0,0,0,16">
-                        <StackPanel>
-                            <Border Style="{StaticResource SectionHeaderStyle}">
-                                <ui:TextBlock Text="About" Style="{StaticResource SectionHeaderTextStyle}" />
-                            </Border>
-                            <StackPanel Margin="16" HorizontalAlignment="Center">
-                                <Image Source="Resources/SteamedPass.png" Width="140" Height="140" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,4,0,12" />
-                                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,12">
-                                    <Run Text="steamedpass adds Game Pass / Microsoft Store games to Steam as non-Steam shortcuts, with working desktop icons and Library art." />
-                                </TextBlock>
-                                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Opacity="0.8" Margin="0,0,0,12">
-                                    <Run Text="Adapts discovery and shortcut handling from UWPHook and VDFParser (MIT licensed)." />
-                                </TextBlock>
-                                <ui:HyperlinkButton Content="UWPHook @ GitHub" Icon="{ui:SymbolIcon Open24}" NavigateUri="https://github.com/BrianLima/UWPHook" HorizontalAlignment="Center" Margin="0,0,0,4" />
-                                <ui:HyperlinkButton Content="VDFParser @ GitHub" Icon="{ui:SymbolIcon Open24}" NavigateUri="https://github.com/BrianLima/VDFParser" HorizontalAlignment="Center" />
-                            </StackPanel>
+                    <ui:TextBlock Text="About" Style="{StaticResource SectionLabelStyle}" />
+                    <ui:Card Margin="0,0,0,16">
+                        <StackPanel HorizontalAlignment="Center">
+                            <Image Source="Resources/SteamedPass.png" Width="140" Height="140" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,4,0,12" />
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,12">
+                                <Run Text="steamedpass adds Game Pass / Microsoft Store games to Steam as non-Steam shortcuts, with working desktop icons and Library art." />
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Opacity="0.8" Margin="0,0,0,12">
+                                <Run Text="Adapts discovery and shortcut handling from UWPHook and VDFParser (MIT licensed)." />
+                            </TextBlock>
+                            <ui:HyperlinkButton Content="UWPHook @ GitHub" Icon="{ui:SymbolIcon Open24}" NavigateUri="https://github.com/BrianLima/UWPHook" HorizontalAlignment="Center" Margin="0,0,0,4" />
+                            <ui:HyperlinkButton Content="VDFParser @ GitHub" Icon="{ui:SymbolIcon Open24}" NavigateUri="https://github.com/BrianLima/VDFParser" HorizontalAlignment="Center" />
                         </StackPanel>
                     </ui:Card>
 
-                    <ui:Card Padding="0">
+                    <ui:TextBlock Text="Maintenance" Style="{StaticResource SectionLabelStyle}" />
+                    <ui:Card>
                         <StackPanel>
-                            <Border Style="{StaticResource SectionHeaderStyle}">
-                                <ui:TextBlock Text="Maintenance" Style="{StaticResource SectionHeaderTextStyle}" />
-                            </Border>
-                            <StackPanel Margin="16">
-                                <TextBlock TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,12"
-                                           Text="Removes ALL non-Steam game shortcuts from Steam, not just ones steamedpass added." />
-                                <ui:Button x:Name="ClearAllButton" Content="Clear all non-Steam shortcuts..." Appearance="Danger"
-                                           Icon="{ui:SymbolIcon Delete24}" HorizontalAlignment="Stretch" Click="ClearAllButton_Click" />
-                            </StackPanel>
+                            <TextBlock TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,12"
+                                       Text="Removes ALL non-Steam game shortcuts from Steam, not just ones steamedpass added." />
+                            <ui:Button x:Name="ClearAllButton" Content="Clear all non-Steam shortcuts..." Appearance="Danger"
+                                       Icon="{ui:SymbolIcon Delete24}" HorizontalAlignment="Stretch" Click="ClearAllButton_Click" />
                         </StackPanel>
                     </ui:Card>
 
