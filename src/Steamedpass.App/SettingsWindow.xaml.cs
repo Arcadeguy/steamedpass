@@ -129,7 +129,7 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
     private void ClearAllButton_Click(object sender, RoutedEventArgs e)
     {
         MessageBoxResult result = MessageBox.Show(
-            "This will remove ALL non-Steam game shortcuts (not just ones steamedpass added). Are you sure you want to continue?",
+            "This will remove ALL non-Steam game shortcuts (not just ones SteamedPass added). Are you sure you want to continue?",
             "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
         if (result != MessageBoxResult.Yes)

@@ -201,7 +201,7 @@
                         <StackPanel HorizontalAlignment="Center">
                             <Image Source="Resources/SteamedPass.png" Width="140" Height="140" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,4,0,12" />
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,12">
-                                <Run Text="steamedpass adds Game Pass / Microsoft Store games to Steam as non-Steam shortcuts, with working desktop icons and Library art." />
+                                <Run Text="SteamedPass adds Game Pass / Microsoft Store games to Steam as non-Steam shortcuts, with working desktop icons and Library art." />
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center" Opacity="0.8" Margin="0,0,0,12">
                                 <Run Text="Adapts discovery and shortcut handling from UWPHook and VDFParser (MIT licensed)." />
@@ -215,7 +215,7 @@
                     <ui:Card>
                         <StackPanel>
                             <TextBlock TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,12"
-                                       Text="Removes ALL non-Steam game shortcuts from Steam, not just ones steamedpass added." />
+                                       Text="Removes ALL non-Steam game shortcuts from Steam, not just ones SteamedPass added." />
                             <ui:Button x:Name="ClearAllButton" Content="Clear all non-Steam shortcuts..." Appearance="Danger"
                                        Icon="{ui:SymbolIcon Delete24}" HorizontalAlignment="Stretch" Click="ClearAllButton_Click" />
                         </StackPanel>

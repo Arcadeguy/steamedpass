@@ -94,7 +94,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <ui:TextBlock Grid.Row="0" Text="Installed Game Pass apps" FontTypography="BodyStrong" Margin="0,0,0,8" />
+            <ui:TextBlock Grid.Row="0" Text="List of installed UWP apps" FontTypography="BodyStrong" Margin="0,0,0,8" />
 
             <ui:Card Grid.Row="1" Padding="0">
                 <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent">
