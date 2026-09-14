@@ -1,9 +1,9 @@
-# steamedpass
+# SteamedPass
 
 Adds Microsoft Store / Xbox Game Pass games to Steam as non-Steam shortcuts,
-and — unlike other tools — makes sure the **desktop shortcut** for that game
+and — unlike other tools — makes sure the **desktop shortcut** for each game
 actually shows the right icon and the Steam Library shows real box art
-instead of a blank tile.
+instead of a blank tile. Add one game or a whole batch at once.
 
 ## Why
 
@@ -11,7 +11,7 @@ Tools like [UWPHook](https://github.com/BrianLima/UWPHook) already add Game
 Pass games to Steam's library, and Steam displays them fine there. But when
 you create a desktop shortcut for one of these non-Steam entries, Steam
 leaves it with a **blank icon** — it never generates the `.ico` file its own
-shortcut feature relies on for non-Steam games. `steamedpass` fixes that by
+shortcut feature relies on for non-Steam games. SteamedPass fixes that by
 pulling a real icon straight from the app's package and authoring the
 desktop shortcut itself, plus restores Steam's Library grid art via
 SteamGridDB.
@@ -19,33 +19,41 @@ SteamGridDB.
 ## What it does (one click / one command)
 
 1. Scans installed Game Pass / Microsoft Store apps.
-2. Adds the selected app to Steam's `shortcuts.vdf` as a non-Steam game
-   (closing and relaunching Steam so the change takes effect).
-3. Downloads Library grid/hero/logo art from SteamGridDB, if an API key is
-   configured.
-4. Extracts a proper icon directly from the app's AUMID (via the Shell API
+2. Adds the selected app(s) to Steam's `shortcuts.vdf` as non-Steam games
+   (closing and relaunching Steam once for the whole batch, even when adding
+   several games at a time, so the change takes effect).
+3. Downloads Library grid/hero/logo art from SteamGridDB for each game, if
+   an API key is configured.
+4. Extracts a proper icon directly from each app's AUMID (via the Shell API
    — no intermediate shortcut file needed) and saves it as a real `.ico`.
-5. Authors the desktop shortcut (`.url`) itself, pointing `IconFile` at that
+5. Authors each desktop shortcut (`.url`) itself, pointing `IconFile` at that
    `.ico`, bypassing Steam's own broken desktop-shortcut generation.
 
-## Requirements
+## Installation
 
-- Windows 10/11
-- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) to build
-- Steam installed
-- Optional: a free [SteamGridDB API key](https://www.steamgriddb.com/profile/preferences/api)
-  for Library grid/hero/logo art
+SteamedPass is a portable executable — there's no installer, and no
+pre-built download yet, so build it from source:
 
-## Building
+1. Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+   Windows 10/11 is required — this uses WPF and Win32 APIs and won't build
+   or run on other platforms.
+2. Make sure Steam is installed.
+3. Clone the repo and build it:
 
-```
-dotnet build Steamedpass.slnx
-```
+   ```
+   git clone https://github.com/Arcadeguy/steamedpass.git
+   cd steamedpass
+   dotnet build Steamedpass.slnx
+   ```
 
-The app is `src/Steamedpass.App/bin/Debug/net10.0-windows/steamedpass.exe`.
-It's a portable executable — no installer — but it needs to stay at a
-stable path once you've added games with it, since Steam launches games
-*through* this exe (see "How launching works" below).
+4. Run it from `src/Steamedpass.App/bin/Debug/net10.0-windows/steamedpass.exe`.
+
+Keep the exe at a stable path once you've added games with it — Steam
+launches games *through* this same exe (see "How launching works" below),
+so moving or deleting it breaks any shortcuts you've already created.
+
+Optional: get a free [SteamGridDB API key](https://www.steamgriddb.com/profile/preferences/api)
+and paste it into Settings to enable Library grid/hero/logo art.
 
 ## Using the GUI
 
@@ -83,6 +91,8 @@ into source control). Options mirror UWPHook's settings page:
 |---|---|
 | SteamGridDB API key + Style/Type/NSFW/Humor filters | Controls Library grid art downloads |
 | Steam category tags | Comma-separated, applied to every shortcut (default `GAMEPASS`) |
+| Create desktop shortcut | On by default; extracts a real icon and authors the `.url` shortcut |
+| Theme | System / Light / Dark |
 | Log level | Error / Debug / Trace, written to `%AppData%\steamedpass\application.log` |
 | Poll seconds | How often to check whether a launched game is still running |
 | Stream mode | Shows a full-screen cover window for ~10s before launch |
@@ -91,8 +101,11 @@ into source control). Options mirror UWPHook's settings page:
 
 Note: UWPHook's resolution-change feature calls a `Set-DisplayResolution`
 PowerShell cmdlet that doesn't actually exist in Windows or ship with
-UWPHook, so it silently no-ops there. `steamedpass` implements this natively
+UWPHook, so it silently no-ops there. SteamedPass implements this natively
 via the Win32 display API instead, so if you enable it, it actually works.
+
+The Settings window's About section also shows the current app version and
+a link back to this repository.
 
 ## How launching works
 
@@ -109,6 +122,8 @@ works) and blocks until the game exits.
   extraction, SteamGridDB client, desktop shortcut writer, settings, and the
   `AddGamePipeline` that ties it all together. No UI dependencies.
 - `src/Steamedpass.App` — WPF GUI, CLI, and the launcher-stub entry point.
+
+See [CHANGELOG.md](CHANGELOG.md) for what's changed release to release.
 
 ## Credits
 
