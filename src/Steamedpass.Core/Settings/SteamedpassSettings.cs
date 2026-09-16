@@ -45,6 +45,9 @@ public sealed class SteamedpassSettings
     /// <summary>Whether adding a game also authors a desktop shortcut for it.</summary>
     public bool CreateDesktopShortcut { get; set; } = true;
 
+    /// <summary>Automatically checks for and installs app updates on launch.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+
     /// <summary>"System", "Light", or "Dark".</summary>
     public string ThemeMode { get; set; } = "System";
 

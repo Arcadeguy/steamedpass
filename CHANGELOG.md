@@ -2,6 +2,23 @@
 
 All notable changes to SteamedPass are documented in this file.
 
+## [1.1.0] - 2026-09-15
+
+### Added
+
+- Automatic self-updating, built on [Velopack](https://velopack.io): the app
+  checks GitHub Releases on launch and installs + restarts automatically,
+  with a Settings toggle to disable the automatic check and a new
+  `steamedpass update` CLI command for an explicit one.
+
+### Changed
+
+- Releases now ship as a `SteamedPassSetup.exe` installer (per-user, no
+  admin required) instead of a portable `.zip` archive, so future updates
+  can be applied automatically at a stable install path. See the README's
+  "Upgrading from a pre-1.1 portable install" note for migrating existing
+  installs.
+
 ## [1.0.3] - 2026-09-14
 
 ### Changed

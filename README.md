@@ -31,20 +31,25 @@ SteamGridDB.
 
 ## Installation
 
-SteamedPass is a portable executable — there's no installer. Windows 10/11
-is required either way (this uses WPF and Win32 APIs and won't build or run
-on other platforms).
+SteamedPass installs via a small `Setup.exe` (built with
+[Velopack](https://velopack.io)) and updates itself automatically after
+that — no manual downloads needed once you're installed. Windows 10/11 is
+required either way (this uses WPF and Win32 APIs and won't build or run on
+other platforms).
 
 ### Option 1: Download a release (easiest)
 
-1. Grab the latest `SteamedPass-<version>-win.zip` from the
+1. Grab the latest `SteamedPassSetup.exe` from the
    [Releases page](https://github.com/Arcadeguy/steamedpass/releases) and
-   extract it anywhere.
+   run it (per-user install, no admin rights needed).
 2. Install the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0)
-   if you don't already have it (the release download is framework-dependent,
-   so it needs the runtime — not the full SDK — installed separately).
+   if you don't already have it (the app is framework-dependent, so it needs
+   the runtime — not the full SDK — installed separately).
 3. Make sure Steam is installed.
-4. Run `steamedpass.exe` from the extracted folder.
+4. Launch SteamedPass from the Start Menu shortcut the installer creates.
+
+From then on, SteamedPass checks for updates on launch and installs them
+automatically — see the "Check for updates" setting below to turn that off.
 
 ### Option 2: Build from source
 
@@ -60,10 +65,20 @@ on other platforms).
 
 4. Run it from `src/Steamedpass.App/bin/Debug/net10.0-windows/steamedpass.exe`.
 
-Either way, keep the exe at a stable path once you've added games with it —
-Steam launches games *through* this same exe (see "How launching works"
-below), so moving or deleting it breaks any shortcuts you've already
-created.
+A source/dev build runs un-packaged and never self-updates.
+
+Velopack keeps a stable `...\current\steamedpass.exe` path across every
+future update, so once you've added games, updates never require you to
+redo your Steam shortcuts (see "How launching works" below for why the exe
+path matters).
+
+> **Upgrading from a pre-1.1 portable install?** The old portable zip and
+> this installer use different install paths, so Steam's existing shortcuts
+> for your games won't carry over automatically. In your **old** install,
+> open Settings and click **Clear All** to remove its shortcuts (this clears
+> all non-Steam shortcuts, not just SteamedPass's), then install via
+> `SteamedPassSetup.exe` and re-add your games. Every release after that
+> updates in place with no further action needed.
 
 Optional: get a free [SteamGridDB API key](https://www.steamgriddb.com/profile/preferences/api)
 and paste it into Settings to enable Library grid/hero/logo art.
@@ -88,6 +103,7 @@ steamedpass add --name "Halo Infinite" --name "Forza Horizon 5"
 steamedpass add --aumid <AUMID> --aumid <another AUMID>
 steamedpass add --all
 steamedpass config --steamgriddb-key <key>
+steamedpass update
 ```
 
 `--name` and `--aumid` are repeatable and can be mixed in one `add` call;
@@ -96,6 +112,11 @@ are written to `shortcuts.vdf` and Steam is restarted once for the whole
 batch.
 
 `add` runs the exact same pipeline as the GUI's one-click action.
+
+`update` checks GitHub Releases for a newer version and, if one's found,
+downloads it, applies it, and restarts — same thing the GUI does
+automatically on launch (see the "Check for updates" setting below), but
+runs the check regardless of that setting.
 
 ## Settings
 
@@ -106,6 +127,7 @@ into source control). Options mirror UWPHook's settings page:
 |---|---|
 | SteamGridDB API key + Style/Type/NSFW/Humor filters | Controls Library grid art downloads |
 | Create desktop shortcut | On by default; extracts a real icon and authors the `.url` shortcut |
+| Check for updates | On by default; checks GitHub Releases on launch and installs + restarts automatically |
 | Theme | System / Light / Dark |
 | Log level | Error / Debug / Trace, written to `%AppData%\steamedpass\application.log` |
 | Poll seconds | How often to check whether a launched game is still running |

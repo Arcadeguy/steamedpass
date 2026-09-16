@@ -37,6 +37,7 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
         };
 
         CreateDesktopShortcutCheck.IsChecked = _settings.CreateDesktopShortcut;
+        CheckForUpdatesCheck.IsChecked = _settings.CheckForUpdates;
 
         LanguageCombo.ItemsSource = CultureInfo.GetCultures(CultureTypes.AllCultures)
             .Select(c => c.Name).Where(n => !string.IsNullOrEmpty(n)).OrderBy(n => n).ToList();
@@ -91,6 +92,7 @@ public partial class SettingsWindow : Wpf.Ui.Controls.FluentWindow
     {
         _settings.ThemeMode = GetSelectedThemeMode();
         _settings.CreateDesktopShortcut = CreateDesktopShortcutCheck.IsChecked == true;
+        _settings.CheckForUpdates = CheckForUpdatesCheck.IsChecked == true;
         _settings.ChangeLanguage = ChangeLanguageCheck.IsChecked == true;
         _settings.TargetLanguage = LanguageCombo.SelectedItem?.ToString() ?? string.Empty;
         _settings.PollSeconds = SecondsCombo.SelectedIndex;

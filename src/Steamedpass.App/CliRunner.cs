@@ -1,7 +1,9 @@
 using Serilog;
+using Steamedpass.App.Updates;
 using Steamedpass.Core.Discovery;
 using Steamedpass.Core.Pipeline;
 using Steamedpass.Core.Settings;
+using Velopack;
 
 namespace Steamedpass.App;
 
@@ -30,6 +32,8 @@ internal static class CliRunner
                 return await RunAddAsync(args.Skip(1).ToArray());
             case "config":
                 return RunConfig(args.Skip(1).ToArray());
+            case "update":
+                return await RunUpdateAsync();
             default:
                 PrintUsage();
                 return 1;
@@ -150,6 +154,27 @@ internal static class CliRunner
         return 0;
     }
 
+    private static async Task<int> RunUpdateAsync()
+    {
+        Console.WriteLine("Checking for updates...");
+
+        UpdateInfo? update = await UpdateService.CheckAsync();
+        if (update is null)
+        {
+            Console.WriteLine("SteamedPass is up to date.");
+            return 0;
+        }
+
+        Console.WriteLine($"Downloading v{update.TargetFullRelease.Version}...");
+        bool applied = await UpdateService.DownloadAndApplyAsync(
+            update, percent => Console.Write($"\r{percent}%   "));
+
+        // ApplyUpdatesAndRestart replaces the process on success; only reachable on failure.
+        Console.WriteLine();
+        Console.Error.WriteLine("Update failed. See %AppData%\\steamedpass\\application.log for details.");
+        return applied ? 0 : 1;
+    }
+
     private static string? GetArgValue(string[] args, string flag)
     {
         int index = Array.IndexOf(args, flag);
@@ -178,5 +203,6 @@ internal static class CliRunner
         Console.WriteLine("  steamedpass add --aumid <AUMID> [--aumid <another AUMID> ...]");
         Console.WriteLine("  steamedpass add --all");
         Console.WriteLine("  steamedpass config --steamgriddb-key <key>");
+        Console.WriteLine("  steamedpass update");
     }
 }

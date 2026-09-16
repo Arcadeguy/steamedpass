@@ -6,11 +6,19 @@
 
   <ItemGroup>
     <PackageReference Include="WPF-UI" Version="4.3.0" />
+    <PackageReference Include="Velopack" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Resources\SteamedPass.png" />
     <Resource Include="Resources\SteamedPass.ico" />
+  </ItemGroup>
+
+  <!-- Velopack needs a custom Main (in App.xaml.cs) that runs before the Application
+       object is constructed, so WPF's auto-generated entry point must be disabled. -->
+  <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -21,8 +29,9 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>steamedpass</AssemblyName>
     <ApplicationIcon>Resources\SteamedPass.ico</ApplicationIcon>
-    <Version>1.0.3</Version>
+    <Version>1.1.0</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <StartupObject>Steamedpass.App.App</StartupObject>
   </PropertyGroup>
 
 </Project>

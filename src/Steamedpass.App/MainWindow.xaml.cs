@@ -3,11 +3,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Serilog;
+using Steamedpass.App.Updates;
 using Steamedpass.Core.Discovery;
 using Steamedpass.Core.Icons;
 using Steamedpass.Core.Pipeline;
 using Steamedpass.Core.Settings;
 using Steamedpass.Core.Steam;
+using Velopack;
 
 namespace Steamedpass.App;
 
@@ -35,6 +37,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             // The ListView hasn't finished its first layout pass yet at this point,
             // so the other columns' ActualWidth isn't reliable until it settles.
             _ = Dispatcher.BeginInvoke(ResizeAumidColumn, System.Windows.Threading.DispatcherPriority.Loaded);
+
+            _ = CheckForUpdatesOnStartupAsync();
         };
         GamesList.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(GamesList_HeaderClick));
         GamesList.SizeChanged += (_, _) => ResizeAumidColumn();
@@ -62,6 +66,34 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     }
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshGamesAsync();
+
+    /// <summary>
+    /// Best-effort: checks for and applies an app update on launch, if enabled in
+    /// settings. Runs after the game grid is already populated, and never blocks or
+    /// fails app usage - a failed check just leaves the current version running.
+    /// </summary>
+    private async Task CheckForUpdatesOnStartupAsync()
+    {
+        if (!SteamedpassSettings.Load().CheckForUpdates)
+        {
+            return;
+        }
+
+        UpdateInfo? update = await UpdateService.CheckAsync();
+        if (update is null)
+        {
+            return;
+        }
+
+        StatusText.Text = $"Updating to v{update.TargetFullRelease.Version}...";
+        bool applied = await UpdateService.DownloadAndApplyAsync(update);
+
+        // ApplyUpdatesAndRestart replaces the process on success; reaching here means it failed.
+        if (!applied)
+        {
+            StatusText.Text = "Update failed - see application.log for details.";
+        }
+    }
 
     private async Task RefreshGamesAsync()
     {

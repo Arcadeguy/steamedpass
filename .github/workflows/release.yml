@@ -13,6 +13,9 @@ on:
 permissions:
   contents: write
 
+env:
+  VELOPACK_VERSION: '1.2.0'
+
 jobs:
   release:
     runs-on: windows-latest
@@ -22,6 +25,13 @@ jobs:
         shell: bash
         run: echo "name=${{ github.event.inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
 
+      - name: Determine version
+        id: version
+        shell: bash
+        run: echo "number=${TAG#v}" >> "$GITHUB_OUTPUT"
+        env:
+          TAG: ${{ steps.tag.outputs.name }}
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ steps.tag.outputs.name }}
@@ -30,18 +40,42 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Install vpk
+        run: dotnet tool install -g vpk --version ${{ env.VELOPACK_VERSION }}
+
       - name: Publish
         run: dotnet publish src/Steamedpass.App/Steamedpass.App.csproj -c Release -o publish
 
-      - name: Zip archive
-        shell: pwsh
-        run: Compress-Archive -Path publish/* -DestinationPath "SteamedPass-${{ steps.tag.outputs.name }}-win.zip"
+      - name: Download previous release
+        shell: bash
+        continue-on-error: true
+        run: vpk download github --repoUrl https://github.com/Arcadeguy/steamedpass
 
-      - name: Create GitHub Release
+      - name: Pack
+        shell: bash
+        run: >-
+          vpk pack
+          --packId SteamedPass
+          --packVersion ${{ steps.version.outputs.number }}
+          --packDir publish
+          --mainExe steamedpass.exe
+          --icon src/Steamedpass.App/Resources/SteamedPass.ico
+          --packTitle SteamedPass
+
+      - name: Upload to GitHub Releases
+        shell: bash
+        env:
+          VPK_TOKEN: ${{ github.token }}
+        run: >-
+          vpk upload github
+          --repoUrl https://github.com/Arcadeguy/steamedpass
+          --token $VPK_TOKEN
+          --tag ${{ steps.tag.outputs.name }}
+          --releaseName "SteamedPass ${{ steps.tag.outputs.name }}"
+          --publish
+
+      - name: Generate release notes
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${{ steps.tag.outputs.name }}" "SteamedPass-${{ steps.tag.outputs.name }}-win.zip" \
-            --title "${{ steps.tag.outputs.name }}" \
-            --generate-notes
+        run: gh release edit "${{ steps.tag.outputs.name }}" --generate-notes
