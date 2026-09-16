@@ -14,6 +14,7 @@
         WindowStartupLocation="CenterScreen">
     <ui:FluentWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <local:IconPathToImageSourceConverter x:Key="IconPathToImageSource" />
         <Style x:Key="GamesGridHeaderStyle" TargetType="GridViewColumnHeader">
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -133,7 +134,7 @@
                                 <GridViewColumn x:Name="IconColumn" Header="Icon" Width="48">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Image Source="{Binding IconPath}" Width="28" Height="28"
+                                            <Image Source="{Binding IconPath, Converter={StaticResource IconPathToImageSource}}" Width="28" Height="28"
                                                    Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
