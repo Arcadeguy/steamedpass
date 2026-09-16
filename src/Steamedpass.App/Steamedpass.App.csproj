@@ -29,7 +29,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>steamedpass</AssemblyName>
     <ApplicationIcon>Resources\SteamedPass.ico</ApplicationIcon>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <StartupObject>Steamedpass.App.App</StartupObject>
   </PropertyGroup>

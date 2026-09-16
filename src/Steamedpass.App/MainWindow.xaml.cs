@@ -125,6 +125,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
             GamesList.ItemsSource = selectableGames;
             ApplyCurrentSort();
+            ApplyFilter();
             SelectAllCheckBox.IsChecked = false;
             StatusText.Text = $"{selectableGames.Count} app(s) found.";
         }
@@ -245,6 +246,22 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private static string? GetSortProperty(GridViewColumn? column) =>
         (column?.DisplayMemberBinding as Binding)?.Path?.Path;
+
+    private void FilterTextBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
+
+    private void ApplyFilter()
+    {
+        if (GamesList.ItemsSource is null)
+        {
+            return;
+        }
+
+        string filter = FilterTextBox.Text.Trim();
+        ICollectionView view = CollectionViewSource.GetDefaultView(GamesList.ItemsSource);
+        view.Filter = filter.Length == 0
+            ? null
+            : item => item is SelectableGame game && game.Name.Contains(filter, StringComparison.OrdinalIgnoreCase);
+    }
 
     private async void AddButton_Click(object sender, RoutedEventArgs e)
     {

@@ -97,7 +97,15 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <ui:TextBlock Grid.Row="0" Text="List of installed UWP apps" FontTypography="BodyStrong" Margin="0,0,0,8" />
+            <Grid Grid.Row="0" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="240" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBlock Grid.Column="0" Text="List of installed UWP apps" FontTypography="BodyStrong" VerticalAlignment="Center" />
+                <ui:TextBox x:Name="FilterTextBox" Grid.Column="1" PlaceholderText="Filter by name..."
+                            Icon="{ui:SymbolIcon Search24}" TextChanged="FilterTextBox_TextChanged" />
+            </Grid>
 
             <ProgressBar x:Name="RefreshProgressBar" Grid.Row="1" IsIndeterminate="True" Height="3"
                          BorderThickness="0" Background="Transparent"
@@ -105,8 +113,11 @@
                          Margin="0,0,0,8" Visibility="Collapsed" />
 
             <Grid Grid.Row="2">
-                <ui:Card Padding="0">
-                    <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent">
+                <ui:Card Padding="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                    <ui:ListView x:Name="GamesList" BorderThickness="0" Background="Transparent"
+                                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top">
                         <ui:ListView.View>
                             <ui:GridView ColumnHeaderContainerStyle="{StaticResource GamesGridHeaderStyle}">
                                 <GridViewColumn x:Name="SelectColumn" Width="60">

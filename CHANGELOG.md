@@ -2,6 +2,19 @@
 
 All notable changes to SteamedPass are documented in this file.
 
+## [1.1.1] - 2026-09-15
+
+### Added
+
+- A filter field above the games grid (like UWPHook's) that narrows the list
+  to apps whose name matches as you type.
+
+### Fixed
+
+- The games grid centered itself vertically instead of staying pinned to
+  the top whenever it had few enough rows to not fill the panel (most
+  visible while filtering to a handful of results).
+
 ## [1.1.0] - 2026-09-15
 
 ### Added
